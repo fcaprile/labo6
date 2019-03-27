@@ -12,7 +12,7 @@ from scipy.optimize import curve_fit
 from array import array
 import os
 import sys
-import scipy.integrate as inte
+from scipy.integrate import cumtrapz as integrar
 from scipy.signal import filtfilt as filtro 
 carpeta='C:/Users/Admin/Desktop/L6 Caprile Rosenberg/Mediciones_25-03/posta/'
 
@@ -21,6 +21,8 @@ for archivo in os.listdir(carpeta):
     if archivo.endswith(".txt"):
         indice.append(archivo)
         
+
+
 
 for j in range(1):#int(len(indice)/2)
     plt.figure(num=j, figsize=(8, 4), dpi=80, facecolor='w', edgecolor='k')
@@ -35,10 +37,10 @@ for j in range(1):#int(len(indice)/2)
         
     y=mediciones[:,0]
     
-    yint=[]
+    yint=integrar(y,x)
     
     
-    plt.plot(t,filtro(y))    
+    plt.plot(t,yint)    
         
         
     nombre=indice[j+4]
