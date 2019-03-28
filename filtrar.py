@@ -24,6 +24,7 @@ import numpy as np
 import pandas as pd
 import scipy
 carpeta='C:/Users/Admin/Desktop/L6 Caprile Rosenberg/Mediciones_25-03/posta/'
+carpeta='C:/Users/Admin/Desktop/Github labo 6/labo 6/mediciones/27-03/'
 
 
 

@@ -6,40 +6,6 @@ Created on Wed Mar 27 11:04:50 2019
 """
 
 import numpy as np
-import matplotlib.pyplot as plt
-import sys
-sys.path.insert(1, r'./../functions')  # add to pythonpath
-from detect_peaks import detect_peaks
-
-x = np.random.randn(100)
-x[60:81] = np.nan
-# detect all peaks and plot data
-ind = detect_peaks(x, show=True)
-print(ind)
-
-x = np.sin(2*np.pi*5*np.linspace(0, 1, 200)) + np.random.randn(200)/5
-# set minimum peak height = 0 and minimum peak distance = 20
-detect_peaks(x, mph=0, mpd=20, show=True)
-
-x = [0, 1, 0, 2, 0, 3, 0, 2, 0, 1, 0]
-# set minimum peak distance = 2
-detect_peaks(x, mpd=2, show=True)
-
-x = np.sin(2*np.pi*5*np.linspace(0, 1, 200)) + np.random.randn(200)/5
-# detection of valleys instead of peaks
-detect_peaks(x, mph=-1.2, mpd=20, valley=True, show=True)
-
-x = [0, 1, 1, 0, 1, 1, 0]
-# detect both edges
-detect_peaks(x, edge='both', show=True)
-
-x = [-2, 1, -2, 2, 1, 1, 3, 0]
-# set threshold = 2
-detect_peaks(x, threshold = 2, show=True)
-
-
-from __future__ import division, print_function
-import numpy as np
 
 __author__ = "Marcos Duarte, https://github.com/demotu/BMC"
 __version__ = "1.0.5"

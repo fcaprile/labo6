@@ -12,7 +12,8 @@ import os
 import pandas as pd
 
 carpeta='C:/Users/Admin/Desktop/L6 Caprile Rosenberg/Mediciones_27-03'
- 
+carpeta='C:/Users/Admin/Desktop/Github labo 6/labo 6/mediciones/27-03/'
+
 indice=[]
 for archivo in os.listdir(carpeta):
     if archivo.endswith(".txt"):
