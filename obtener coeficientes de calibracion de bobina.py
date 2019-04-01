@@ -56,7 +56,6 @@ j=1
 #kes=np.array([0,2,12,27,54,56,60,64,83,96])
 
 n=75
-nk=0
 nombre=indice[j+int(len(indice)/2)]
 dataR = np.loadtxt(carpeta+nombre, delimiter='\t')
 medicionesR=np.zeros([len(dataR[:,0]),len(dataR[0,:])])
@@ -73,6 +72,7 @@ for i in range(len(dataB[:,0])-1):
 #un for para cada medicion
     
 A=np.zeros(len(mediciones[0,:,0]))
+nk=0
 for k in range(len(mediciones[0,:,0])):#k=0
     #resistencia
     R=0.55
@@ -100,12 +100,26 @@ for k in range(len(mediciones[0,:,0])):#k=0
 #        #plt.plot(t,yB*1000,'b')
 #        plt.plot(tR[:-100],yR,'r')
 #        plt.grid(True)
+    if k%50==0 and k!=0:
+        print('Ya se analizaron',k,'mediciones!')
     nk+=1
     
 coeficientes=[]
 for i in range(len(A)):
     if A[i]!=A[i-1]:
-        coeficiente.append(A)
-plt.hist(coeficientes,10)
-plt.plot(np.arange(0,len(mediciones[0,:,0]),1),coeficiente,'b*')
+        coeficientes.append(A[i])
+coeficientes=np.array(coeficientes)
+        
+#coeficientes2=[]
+#for i in range(len(coeficientes)):
+#    if (1*10**9)>coeficientes[i]>(0.9*10**9):
+#        coeficientes2.append(coeficientes[i])
+        
+plt.figure(num=1, figsize=(14, 10), dpi=80, facecolor='w', edgecolor='k')
+n,bins,patches=plt.hist(coeficientes,20,edgecolor='blue')
+plt.title('Histograma de valores de la constante de calibración')
+plt.xlabel('Valor de "A"')
+plt.ylabel('Cantidad')
+
+#plt.plot(np.arange(0,len(mediciones[0,:,0]),1),coeficientes,'b*')
 
