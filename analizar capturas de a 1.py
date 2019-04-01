@@ -20,15 +20,16 @@ import os
 import sys
 from scipy.integrate import cumtrapz as integrar
 from scipy.signal import filtfilt as filtro 
+plt.clf()
+plt.close()
 
-carpeta='C:/Users/Admin/Desktop/L6 Caprile Rosenberg/Mediciones_25-03/posta/'
-carpeta='C:/Users/ferchi/Desktop/github labo 6/labo6/mediciones/27-03/'
+#carpeta='C:/Users/Admin/Desktop/L6 Caprile Rosenberg/Mediciones_25-03/posta/'
+#carpeta='C:/Users/ferchi/Desktop/github labo 6/labo6/mediciones/27-03/'
 indice=[]
 for archivo in os.listdir(carpeta):
     if archivo.endswith(".txt"):
         indice.append(archivo)
         
-
 def filtrar_por_vecinos(y,n_vecinos):
     yfilt=[]
     for i in range(len(y)):
@@ -51,57 +52,69 @@ def filtrar_por_vecinos(y,n_vecinos):
     yfilt.append(0)
     yfilt=np.array(yfilt)
     return(yfilt)
-j=1
-nombre=indice[j+int(len(indice)/2)]
-data = np.loadtxt(carpeta+nombre, delimiter='\t')
-mediciones=np.zeros([len(data[:,0]),len(data[0,:])])
 
-tR=data[0,:]
-for i in range(len(data[:,0])-1):
-    mediciones[i,:]=data[i+1,:]
-k=4
-yR=mediciones[k,:-100]
-yR=filtrar_por_vecinos(yR,1)
-#    plt.figure(num=j+k, figsize=(8, 4), dpi=80, facecolor='w', edgecolor='k')
+def integrar_entre(y,x,ti,tf):
+    i=int(np.where(abs(x-ti)==min(abs(x-ti)))[0])
+    f=int(np.where(abs(x-tf)==min(abs(x-tf)))[0])
+    yint_aux=integrar(y[i:f],x[i:f])
+    zeros1=np.zeros(i)
+    zeros2=np.zeros(len(y)-f)
+    yint=np.concatenate((zeros1,yint_aux,zeros2), axis = 0)
+    return yint
+
+j=2
+#kes=np.array([0,2,12,27,54,56,60,64,83,96])
+
+n=2
+nk=0
+k=15
+
+#leo los datos de la res
+nombre=indice[j+int(len(indice)/2)]
+dataR = np.loadtxt(carpeta+nombre, delimiter='\t')
+medicionesR=np.zeros([len(dataR[:,0]),len(dataR[0,:])])
+tR=dataR[0,:]
+for i in range(len(dataR[:,0])-1):
+    medicionesR[i,:]=dataR[i+1,:]
+#leo los datos de la bobina
+nombre=indice[j]
+dataB = np.loadtxt(carpeta+nombre, delimiter='\t')
+medicionesB=np.zeros([len(dataB[:,0]),len(dataB[0,:])])
+t=dataB[0,:]
+for i in range(len(dataB[:,0])-1):
+    medicionesB[i,:]=dataB[i+1,:]
+    
+A=np.zeros(len(mediciones[0,:,0]))
+#resistencia
+R=0.55
+yR=medicionesR[k,:-100]/R
+yR=filtrar_por_vecinos(yR,n)
+plt.figure(num=j+k, figsize=(14, 10), dpi=80, facecolor='w', edgecolor='k')
+plt.rcParams['font.size']=17#tamaño de fuente
 #
 #    plt.plot(tR[:-100],yR)
 
-i1 = detect_peaks(yR, mph=min(yR)*0.75, mpd=600,show=True, valley=True)
-#hacer filtro para encontrar mejor el pico
-
-nombre=indice[j]
-data = np.loadtxt(carpeta+nombre, delimiter='\t')
-mediciones=np.zeros([len(data[:,0]),len(data[0,:])])
-t=data[0,:]
-for i in range(len(data[:,0])-1):
-    mediciones[i,:]=data[i+1,:]
+i1 = detect_peaks(yR, mph=min(yR)*0.75, mpd=600,show=False, valley=True)
+#bobina    
     
-yB=mediciones[k,:]
+yB=-medicionesB[k,:]
+yB=filtrar_por_vecinos(yB,n)
 
 #    yoff=np.mean(y[0:50])
 #    y-=yoff
 yint=integrar(yB,t)
-i2 = detect_peaks(yint, mph=max(yint)*0.75, mpd=100,show=True, valley=False)
-if len(i2)==1 and len(i1)==1:
-    plt.figure(num=j+k, figsize=(8, 4), dpi=80, facecolor='w', edgecolor='k')
-    A = np.divide(yR[i1], yint[i2])
-    tB=t-t[i2]+t[i1]
-    plt.plot(tB[:-1],yint*A,'b')    
+#yint=yB[1:]
+i2 = detect_peaks(yint, mph=min(yint)*0.75, mpd=100,show=False, valley=True)
+if len(i2)>0 and len(i1)>0:
+    A[nk] = np.divide(yR[i1[0]], yint[i2[0]])
+    tB=t
+#    tB=t-t[i2[0]]+t[i1[0]]
+    plt.plot(tB[:-1],yint*A[nk],'b',label='Bobina')    
     #plt.plot(t,yB*1000,'b')
-    plt.plot(tR[:-100],yR,'r')
+    plt.plot(tR[:-100],yR,'r',label='Resistencia')
+    plt.legend(loc='best')
     plt.grid(True)
-#    carpeta_guardar='C:/Users/ferchi/Desktop/github labo 6/labo6/mediciones/27-03/graficos analisis/'
-#    plt.savefig(carpeta_guardar+nombre +'medición Nº'+ str(k)+'.png')
-#    plt.clf()
-#    plt.close()
-#else:
-#    print('En la medición Nº '+str(k)+' no se pudo encontrar el pico')
-#    plt.plot(t[:-1],-yint*100000000,'b')
-#    plt.plot(tR[:-100],yR,'r')
-            
-
-
-
+    
 
 
 
