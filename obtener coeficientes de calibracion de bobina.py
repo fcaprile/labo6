@@ -24,7 +24,7 @@ plt.clf()
 plt.close()
 
 #carpeta='C:/Users/Admin/Desktop/L6 Caprile Rosenberg/Mediciones_25-03/posta/'
-#carpeta='C:/Users/ferchi/Desktop/github labo 6/labo6/mediciones/27-03/'
+carpeta='C:/Users/ferchi/Desktop/github labo 6/labo6/mediciones/4-1/'
 indice=[]
 for archivo in os.listdir(carpeta):
     if archivo.endswith(".txt"):
@@ -52,14 +52,14 @@ def filtrar_por_vecinos(y,n_vecinos):
     yfilt.append(0)
     yfilt=np.array(yfilt)
     return(yfilt)
-j=1
+j=2
 #kes=np.array([0,2,12,27,54,56,60,64,83,96])
 
-n=75
+#cargo datos    
+
 nombre=indice[j+int(len(indice)/2)]
 dataR = np.loadtxt(carpeta+nombre, delimiter='\t')
 medicionesR=np.zeros([len(dataR[:,0]),len(dataR[0,:])])
-#cargo datos    
 tR=dataR[0,:]
 for i in range(len(dataR[:,0])-1):
     medicionesR[i,:]=dataR[i+1,:]
@@ -69,11 +69,15 @@ medicionesB=np.zeros([len(dataB[:,0]),len(dataB[0,:])])
 t=dataB[0,:]
 for i in range(len(dataB[:,0])-1):
     medicionesB[i,:]=dataB[i+1,:]
+
+#%%
+
 #un for para cada medicion
+n=5
     
-A=np.zeros(len(mediciones[0,:,0]))
+A=np.zeros(len(medicionesR[:,0]))
 nk=0
-for k in range(len(mediciones[0,:,0])):#k=0
+for k in range(len(medicionesR[:,0])):
     #resistencia
     R=0.55
     yR=medicionesR[k,:-100]/R
@@ -82,13 +86,12 @@ for k in range(len(mediciones[0,:,0])):#k=0
 #    plt.plot(tR[:-100],yR)
 
     i1 = detect_peaks(yR, mph=min(yR)*0.75, mpd=600,show=False, valley=True)
-    #bobina    
-        
+
+    #bobina            
     yB=-medicionesB[k,:]
     yB=filtrar_por_vecinos(yB,n)
     
 #    yoff=np.mean(y[0:50])
-#    y-=yoff
     yint=integrar(yB,t)
 #    yint=yB[1:]
     i2 = detect_peaks(yint, mph=min(yint)*0.75, mpd=100,show=False, valley=True)
@@ -103,23 +106,57 @@ for k in range(len(mediciones[0,:,0])):#k=0
     if k%50==0 and k!=0:
         print('Ya se analizaron',k,'mediciones!')
     nk+=1
+
+if A[-1]==0:
+    A=np.delete(A,-1)
     
 coeficientes=[]
 for i in range(len(A)):
     if A[i]!=A[i-1]:
         coeficientes.append(A[i])
 coeficientes=np.array(coeficientes)
-        
-#coeficientes2=[]
-#for i in range(len(coeficientes)):
-#    if (1*10**9)>coeficientes[i]>(0.9*10**9):
-#        coeficientes2.append(coeficientes[i])
+
+#coeficientes centrado en ese pico gigante de coeficientes        
+coeficientes2=[]
+for i in range(len(coeficientes)):
+    if (1*10**9)>coeficientes[i]>(0.97*10**9):
+        coeficientes2.append(coeficientes[i])
         
 plt.figure(num=1, figsize=(14, 10), dpi=80, facecolor='w', edgecolor='k')
 n,bins,patches=plt.hist(coeficientes,20,edgecolor='blue')
 plt.title('Histograma de valores de la constante de calibración')
 plt.xlabel('Valor de "A"')
 plt.ylabel('Cantidad')
+
+plt.figure(num=2, figsize=(14, 10), dpi=80, facecolor='w', edgecolor='k')
+n,bins,patches=plt.hist(coeficientes2,20,edgecolor='blue')
+plt.title('Histograma de valores de la constante de calibración')
+plt.xlabel('Valor de "A"')
+plt.ylabel('Cantidad')
+coeficientes2=np.array(coeficientes2)
+coeficientes2=coeficientes2[coeficientes2[:].argsort()]
+
+media=np.mean(coeficientes2)
+N=len(coeficientes2)
+w=bins[1]-bins[0]
+bins=bins[:-1]+w
+posicion_media=int(np.where((abs(coeficientes2-media))==min(abs(coeficientes2-media)))[0])
+Amedio=coeficientes2[posicion_media]
+integral=3
+a=1
+b=1
+while integral<0.95*N:
+    if abs(coeficientes2[posicion_media-a]-Amedio)<abs(coeficientes2[posicion_media+b]-Amedio):
+        a+=1
+        integral+=1
+    if abs(coeficientes2[posicion_media-a]-Amedio)>abs(coeficientes2[posicion_media+b]-Amedio):
+        b+=1
+        integral+=1
+
+error=coeficientes2[posicion_media+b]-coeficientes2[posicion_media-a]
+print('El coeficiente de calibración es:',np.mean(coeficientes2),'+-',error)
+plt.plot(np.linspace(coeficientes2[posicion_media+b],coeficientes2[posicion_media+b],100),np.linspace(0,max(n),100),'r--')
+plt.plot(np.linspace(coeficientes2[posicion_media-a],coeficientes2[posicion_media-a],100),np.linspace(0,max(n),100),'r--')
 
 #plt.plot(np.arange(0,len(mediciones[0,:,0]),1),coeficientes,'b*')
 

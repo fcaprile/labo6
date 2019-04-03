@@ -62,12 +62,12 @@ def integrar_entre(y,x,ti,tf):
     yint=np.concatenate((zeros1,yint_aux,zeros2), axis = 0)
     return yint
 
-j=2
+j=3
 #kes=np.array([0,2,12,27,54,56,60,64,83,96])
 
-n=2
+n=35
 nk=0
-k=15
+k=40
 
 #leo los datos de la res
 nombre=indice[j+int(len(indice)/2)]
@@ -84,10 +84,9 @@ t=dataB[0,:]
 for i in range(len(dataB[:,0])-1):
     medicionesB[i,:]=dataB[i+1,:]
     
-A=np.zeros(len(mediciones[0,:,0]))
 #resistencia
-R=0.55
-yR=medicionesR[k,:-100]/R
+R=0.07
+yR=-medicionesR[k,:-100]/R
 yR=filtrar_por_vecinos(yR,n)
 plt.figure(num=j+k, figsize=(14, 10), dpi=80, facecolor='w', edgecolor='k')
 plt.rcParams['font.size']=17#tamaño de fuente
@@ -106,16 +105,16 @@ yint=integrar(yB,t)
 #yint=yB[1:]
 i2 = detect_peaks(yint, mph=min(yint)*0.75, mpd=100,show=False, valley=True)
 if len(i2)>0 and len(i1)>0:
-    A[nk] = np.divide(yR[i1[0]], yint[i2[0]])
+    A = np.divide(yR[i1[0]], yint[i2[0]])
     tB=t
 #    tB=t-t[i2[0]]+t[i1[0]]
-    plt.plot(tB[:-1],yint*A[nk],'b',label='Bobina')    
+    plt.plot(tB[:-1],yint*A,'b',label='Bobina')    
     #plt.plot(t,yB*1000,'b')
     plt.plot(tR[:-100],yR,'r',label='Resistencia')
     plt.legend(loc='best')
     plt.grid(True)
     
-
+print('El coeficiente fue:',A)
 
 
 
