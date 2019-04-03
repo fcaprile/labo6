@@ -12,3 +12,6 @@ path='C:/Users/Admin/Desktop/L6 Caprile Rosenberg/python/mediciones/'
 day=str(time.localtime()[1])+'-'+str(time.localtime()[2])
 
 os.mkdir(path+day)
+os.mkdir(path+day+'/imagenes')
+
+

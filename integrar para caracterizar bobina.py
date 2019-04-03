@@ -46,9 +46,9 @@ def filtrar_por_vecinos(y,n_vecinos):
     yfilt=np.array(yfilt)
     return(yfilt)
 
-n_vecinos=5
+n_vecinos=15
 #for j in range(int(len(indice)/2)):
-j=2
+j=0
 nombre=indice[j+int(len(indice)/2)]
 dataR = np.loadtxt(carpeta+nombre, delimiter='\t')
 medicionesR=np.zeros([len(dataR[:,0]),len(dataR[0,:])])
@@ -65,7 +65,7 @@ for i in range(len(dataB[:,0])-1):
 #un for para cada medicion
 for k in range(len(medicionesR[:,0])):#k=0   
     #resistencia
-    R=0.55
+    R=0.07
     yR=medicionesR[k,:-100]/R
     yR=filtrar_por_vecinos(yR,n_vecinos)
 #    plt.figure(num=j+k, figsize=(8, 4), dpi=80, facecolor='w', edgecolor='k')
@@ -86,8 +86,8 @@ for k in range(len(medicionesR[:,0])):#k=0
     if len(i2)>0 and len(i1)>0:
         plt.figure(num=1, figsize=(14, 10), dpi=80, facecolor='w', edgecolor='k')
         A = np.divide(yR[i1[0]], yint[i2[0]])
-        tB=t-t[i2[0]]+t[i1[0]]
-        plt.plot(tB[:-1],yint*A,'b')    
+#        tB=t-t[i2[0]]+t[i1[0]]
+        plt.plot(t[:-1],yint*A,'b')    
         #plt.plot(t,yB*1000,'b')
         plt.plot(tR[:-100],yR,'r')
         plt.grid(True)

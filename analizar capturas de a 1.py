@@ -23,7 +23,7 @@ from scipy.signal import filtfilt as filtro
 plt.clf()
 plt.close()
 
-#carpeta='C:/Users/Admin/Desktop/L6 Caprile Rosenberg/Mediciones_25-03/posta/'
+carpeta='C:/Users/Admin/Desktop/L6 Caprile Rosenberg/python/mediciones/4-3/'
 #carpeta='C:/Users/ferchi/Desktop/github labo 6/labo6/mediciones/27-03/'
 indice=[]
 for archivo in os.listdir(carpeta):
@@ -62,12 +62,20 @@ def integrar_entre(y,x,ti,tf):
     yint=np.concatenate((zeros1,yint_aux,zeros2), axis = 0)
     return yint
 
-j=3
-#kes=np.array([0,2,12,27,54,56,60,64,83,96])
+def calibrar(t,y):
+    A=9.72*10**8
+    B=0.911
+    y*=A
+    t*=B
+    return y,t
+#numero de archivo
+j=0
+#kes=np.array([0,2,12,27,54,56,60,64,83,96])#dia 4-1
+#kes=np.array([8,9,22,30,37])#dia 4-3
 
-n=35
+n=15
 nk=0
-k=40
+k=3
 
 #leo los datos de la res
 nombre=indice[j+int(len(indice)/2)]
@@ -85,8 +93,9 @@ for i in range(len(dataB[:,0])-1):
     medicionesB[i,:]=dataB[i+1,:]
     
 #resistencia
-R=0.07
-yR=-medicionesR[k,:-100]/R
+#ATENCION: chequear valor de R y signo de yR antes de correr el script
+R=0.55
+yR=medicionesR[k,:-100]/R
 yR=filtrar_por_vecinos(yR,n)
 plt.figure(num=j+k, figsize=(14, 10), dpi=80, facecolor='w', edgecolor='k')
 plt.rcParams['font.size']=17#tamaño de fuente
@@ -106,14 +115,15 @@ yint=integrar(yB,t)
 i2 = detect_peaks(yint, mph=min(yint)*0.75, mpd=100,show=False, valley=True)
 if len(i2)>0 and len(i1)>0:
     A = np.divide(yR[i1[0]], yint[i2[0]])
-    tB=t
-#    tB=t-t[i2[0]]+t[i1[0]]
+    tB=t-t[i2[0]]+t[i1[0]]
+    tB=(tB)*0.911+(-t[i2[0]]+t[i1[0]])*0.911
     plt.plot(tB[:-1],yint*A,'b',label='Bobina')    
     #plt.plot(t,yB*1000,'b')
     plt.plot(tR[:-100],yR,'r',label='Resistencia')
     plt.legend(loc='best')
     plt.grid(True)
     
+print('Archivo: ',indice[j])    
 print('El coeficiente fue:',A)
 
 

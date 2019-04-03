@@ -19,12 +19,16 @@ from array import array
 import os
 import sys
 from scipy.integrate import cumtrapz as integrar
-from scipy.signal import filtfilt as filtro 
+from scipy.signal import peak_widths as ancho 
+from scipy.signal import find_peaks
+
 plt.clf()
 plt.close()
 
 #carpeta='C:/Users/Admin/Desktop/L6 Caprile Rosenberg/Mediciones_25-03/posta/'
-carpeta='C:/Users/ferchi/Desktop/github labo 6/labo6/mediciones/4-1/'
+#carpeta='C:/Users/ferchi/Desktop/github labo 6/labo6/mediciones/4-1/'
+carpeta='C:/Users/Admin/Desktop/L6 Caprile Rosenberg/python/mediciones/4-3/'
+
 indice=[]
 for archivo in os.listdir(carpeta):
     if archivo.endswith(".txt"):
@@ -52,8 +56,7 @@ def filtrar_por_vecinos(y,n_vecinos):
     yfilt.append(0)
     yfilt=np.array(yfilt)
     return(yfilt)
-j=2
-#kes=np.array([0,2,12,27,54,56,60,64,83,96])
+j=0
 
 #cargo datos    
 
@@ -70,22 +73,35 @@ t=dataB[0,:]
 for i in range(len(dataB[:,0])-1):
     medicionesB[i,:]=dataB[i+1,:]
 
-#%%
+def punto_cercano_al_valor(x,y,valor_y,i):
+    pos=int(np.where((abs(y-valor_y))==min(abs(y-valor_y)))[i])
+    return x[pos],y[pos]
 
-#un for para cada medicion
-n=5
+#def ancho(x,y,valor_y):#solo funciona con funciones unimodales
+#    pos1=int(np.where((abs(y-valor_y))==min(abs(y-valor_y)))[0])
+#    pos2=int(np.where((abs(y-valor_y))==min(abs(y-valor_y)))[1])
+#    return x[pos2]-x[pos1]
+#
+
+#%%
+#ATENCION!!!!!!!: chequear valor de R y signo de yR antes de correr el script
     
-A=np.zeros(len(medicionesR[:,0]))
+#un for para cada medicion
+n=50
+#kes=np.array([0,2,12,27,54,56,60,64,83,96])
+#kes=np.array([8,9,22,30,37])#dia 4-3  
+A=np.zeros(len(medicionesR[:,0]))#coeficiente de amplitudes
+#A=np.zeros(len(kes))#coeficiente de amplitudes
+B=np.zeros(len(medicionesR[:,0]))#coeficientes de "ensanchado"
 nk=0
-for k in range(len(medicionesR[:,0])):
+for k in range(len(medicionesR[:,0])-1):
     #resistencia
     R=0.55
     yR=medicionesR[k,:-100]/R
     yR=filtrar_por_vecinos(yR,n)
-#
 #    plt.plot(tR[:-100],yR)
 
-    i1 = detect_peaks(yR, mph=min(yR)*0.75, mpd=600,show=False, valley=True)
+    iR, _   = find_peaks(-yR,-min(yR)*0.75,distance=100)#detect_peaks(yR, mph=min(yR)*0.75, mpd=600,show=False, valley=True)
 
     #bobina            
     yB=-medicionesB[k,:]
@@ -94,10 +110,18 @@ for k in range(len(medicionesR[:,0])):
 #    yoff=np.mean(y[0:50])
     yint=integrar(yB,t)
 #    yint=yB[1:]
-    i2 = detect_peaks(yint, mph=min(yint)*0.75, mpd=100,show=False, valley=True)
-    if len(i2)>0 and len(i1)>0:
-        A[nk] = np.divide(yR[i1[0]], yint[i2[0]])
-        tB=t-t[i2[0]]+t[i1[0]]
+    iB, _  = find_peaks(-yint,-min(yint)*0.75,distance=100)#detect_peaks(yint, mph=min(yint)*0.75, mpd=100,show=False, valley=True)
+    if len(iR)>0 and len(iB)>0:
+        dt=t[1]-t[0]
+        peaksR, _ = find_peaks(-yR,200,distance=100)
+        A[nk] = np.divide(yR[iR[0]], yint[iB[0]])
+#        tB=t-t[i2[0]]+t[i1[0]]
+        anchoR_pos =ancho(-yR,iR,rel_height=1/np.sqrt(2))
+        anchoR=t[int(anchoR_pos[3])]-t[int(anchoR_pos[2])]
+        anchoB_pos =ancho(-yint,iB,rel_height=1/np.sqrt(2))
+        anchoB=t[int(anchoB_pos[3])]-t[int(anchoB_pos[2])]
+        B[nk]=np.divide(anchoR,anchoB)
+        nk+=1
 #        plt.figure(num=j+k, figsize=(8, 4), dpi=80, facecolor='w', edgecolor='k')
 #        plt.plot(tB[:-1],yint*A[nk],'b')    
 #        #plt.plot(t,yB*1000,'b')
@@ -105,58 +129,95 @@ for k in range(len(medicionesR[:,0])):
 #        plt.grid(True)
     if k%50==0 and k!=0:
         print('Ya se analizaron',k,'mediciones!')
-    nk+=1
 
+#coeficiente ancho
 if A[-1]==0:
     A=np.delete(A,-1)
-    
-coeficientes=[]
+
+if B[-1]==0:
+    B=np.delete(B,-1)
+
+coeficientes_ancho=[]
+for i in range(len(B)):
+    if B[i]!=B[i-1]:
+        coeficientes_ancho.append(B[i])
+coeficientes_ancho=np.array(coeficientes_ancho)
+plt.figure(num=3, figsize=(14, 10), dpi=80, facecolor='w', edgecolor='k')
+n,bins,patches=plt.hist(coeficientes_ancho,20,edgecolor='blue')
+plt.title('Histograma de valores de la constante de ancho')
+plt.xlabel('Valor de "B"')
+plt.ylabel('Cantidad')
+
+#media=np.mean(coeficientes_ancho)
+#N=len(coeficientes_ancho)
+#w=bins[1]-bins[0]
+#bins=bins[:-1]+w
+#posicion_media=int(np.where((abs(coeficientes_ancho-media))==min(abs(coeficientes_ancho-media)))[0])
+#Bmedio=coeficientes_ancho[posicion_media]
+#integral=3
+#a=1
+#b=1
+#while integral<0.95*N:
+#    if abs(coeficientes_ancho[posicion_media-a]-Amedio)<abs(coeficientes_ancho[posicion_media+b]-Bmedio):
+#        a+=1
+#        integral+=1
+#    if abs(coeficientes_ancho[posicion_media-a]-Amedio)>abs(coeficientes_ancho[posicion_media+b]-Bmedio):
+#        b+=1
+#        integral+=1
+#
+#error=(coeficientes_ancho[posicion_media+b]-coeficientes_ancho[posicion_media-a])/2
+#print('El coeficiente de calibración de ancho es:',np.mean(coeficientes_ancho),'+-',error)
+#plt.plot(np.linspace(coeficientes_ancho[posicion_media+b],coeficientes_ancho[posicion_media+b],100),np.linspace(0,max(n),100),'r--')
+#plt.plot(np.linspace(coeficientes_ancho[posicion_media-a],coeficientes_ancho[posicion_media-a],100),np.linspace(0,max(n),100),'r--')
+
+#coeficiente altura
+coeficientes_altura=[]
 for i in range(len(A)):
     if A[i]!=A[i-1]:
-        coeficientes.append(A[i])
-coeficientes=np.array(coeficientes)
+        coeficientes_altura.append(A[i])
+coeficientes_altura=np.array(coeficientes_altura)
 
 #coeficientes centrado en ese pico gigante de coeficientes        
-coeficientes2=[]
-for i in range(len(coeficientes)):
-    if (1*10**9)>coeficientes[i]>(0.97*10**9):
-        coeficientes2.append(coeficientes[i])
+coeficientes2_altura=[]
+for i in range(len(coeficientes_altura)):
+    if (1*10**9)>coeficientes_altura[i]>(0.93*10**9):
+        coeficientes2_altura.append(coeficientes_altura[i])
         
 plt.figure(num=1, figsize=(14, 10), dpi=80, facecolor='w', edgecolor='k')
-n,bins,patches=plt.hist(coeficientes,20,edgecolor='blue')
+n,bins,patches=plt.hist(coeficientes_altura,20,edgecolor='blue')
 plt.title('Histograma de valores de la constante de calibración')
 plt.xlabel('Valor de "A"')
 plt.ylabel('Cantidad')
 
 plt.figure(num=2, figsize=(14, 10), dpi=80, facecolor='w', edgecolor='k')
-n,bins,patches=plt.hist(coeficientes2,20,edgecolor='blue')
+n,bins,patches=plt.hist(coeficientes2_altura,20,edgecolor='blue')
 plt.title('Histograma de valores de la constante de calibración')
 plt.xlabel('Valor de "A"')
 plt.ylabel('Cantidad')
-coeficientes2=np.array(coeficientes2)
-coeficientes2=coeficientes2[coeficientes2[:].argsort()]
+coeficientes2_altura=np.array(coeficientes2_altura)
+coeficientes2_altura=coeficientes2_altura[coeficientes2_altura[:].argsort()]
 
-media=np.mean(coeficientes2)
-N=len(coeficientes2)
+media=np.mean(coeficientes2_altura)
+N=len(coeficientes2_altura)
 w=bins[1]-bins[0]
 bins=bins[:-1]+w
-posicion_media=int(np.where((abs(coeficientes2-media))==min(abs(coeficientes2-media)))[0])
-Amedio=coeficientes2[posicion_media]
+posicion_media=int(np.where((abs(coeficientes2_altura-media))==min(abs(coeficientes2_altura-media)))[0])
+Amedio=coeficientes2_altura[posicion_media]
 integral=3
 a=1
 b=1
 while integral<0.95*N:
-    if abs(coeficientes2[posicion_media-a]-Amedio)<abs(coeficientes2[posicion_media+b]-Amedio):
+    if abs(coeficientes2_altura[posicion_media-a]-Amedio)<abs(coeficientes2_altura[posicion_media+b]-Amedio):
         a+=1
         integral+=1
-    if abs(coeficientes2[posicion_media-a]-Amedio)>abs(coeficientes2[posicion_media+b]-Amedio):
+    if abs(coeficientes2_altura[posicion_media-a]-Amedio)>abs(coeficientes2_altura[posicion_media+b]-Amedio):
         b+=1
         integral+=1
 
-error=coeficientes2[posicion_media+b]-coeficientes2[posicion_media-a]
-print('El coeficiente de calibración es:',np.mean(coeficientes2),'+-',error)
-plt.plot(np.linspace(coeficientes2[posicion_media+b],coeficientes2[posicion_media+b],100),np.linspace(0,max(n),100),'r--')
-plt.plot(np.linspace(coeficientes2[posicion_media-a],coeficientes2[posicion_media-a],100),np.linspace(0,max(n),100),'r--')
+error=(coeficientes2_altura[posicion_media+b]-coeficientes2_altura[posicion_media-a])/2
+print('El coeficiente de calibración de altura es:',np.mean(coeficientes2_altura),'+-',error)
+plt.plot(np.linspace(coeficientes2_altura[posicion_media+b],coeficientes2_altura[posicion_media+b],100),np.linspace(0,max(n),100),'r--')
+plt.plot(np.linspace(coeficientes2_altura[posicion_media-a],coeficientes2_altura[posicion_media-a],100),np.linspace(0,max(n),100),'r--')
 
 #plt.plot(np.arange(0,len(mediciones[0,:,0]),1),coeficientes,'b*')
 

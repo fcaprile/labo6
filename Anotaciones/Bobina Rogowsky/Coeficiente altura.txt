@@ -1,0 +1,16 @@
+R=0.55: (falta propagar el error de la R) 200 datos
+Para número de vecinos n=75 el coeficiente da 982378299.537 +- 16774720.0799 con 95% (o sea (9.82+-0.09)*10**8)
+Para número de vecinos n=15 el coeficiente da 987272055.248 +- 17107647.4923 con 95% (o sea (9.87+-0.09)*10**8)
+Para número de vecinos n=5 el coeficiente da 989428688.176 +- 18735049.4215 con 95% (o sea (9.89+-0.10)*10**8)
+
+R=0.07 10 datos (falta propagar el error de la R) No tiene suficientes datos p/ hacer estadistica!
+Para número de vecinos n=15 el coeficiente da entre 1.35 y 1.65 *10**8 
+Para número de vecinos n=50 el coeficiente da entre 1.33 y 1.62 *10**8
+Para número de vecinos n=75 el coeficiente da entre 1.32 y 1.60 *10**8
+
+repetimos dando vuelta la resistencia (como deberia estar) y variaron bocha los resultados, pero 1 dio en el rango de la de 0.55
+
+
+HICIMOS 500 MEDICIONES DE R055 Y DIO (9.60+-0.17)*10**8
+
+Finalmente, tomamos un valor de (9.7 +- 0.2)*10**8 tomando un valor intermedio entre las dos tiras de mediciones, y un error de la diferencia entre ellas.

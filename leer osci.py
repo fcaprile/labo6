@@ -4,8 +4,8 @@ import numpy as np
 import time
 import os
 rm=visa.ResourceManager()
-carpeta='C:/Users/Admin/Desktop/L6 Caprile Rosenberg/Mediciones_27-03/'
-carpeta=path+day+'/'
+carpeta='C:/Users/Admin/Desktop/L6 Caprile Rosenberg/python/mediciones/4-3/'
+#carpeta=path+day+'/'
 resource_name=rm.list_resources()[0]#'USB0::0x0699::0x0363'*?
                                                                                                                                                                                                         
 
@@ -25,7 +25,7 @@ def medir_trigger():
     r=osci.query('ACQuire:STATE?')
     while r=='1\n':
         r=osci.query('ACQuire:STATE?')
-        time.sleep(0.01)
+        time.sleep(0.02)
     osci.write('DAT:SOU CH1' )
     data1=osci.query_binary_values('CURV?', datatype='B',container=np.array)
     osci.write('DAT:SOU CH2')    
@@ -50,7 +50,7 @@ def medir(ch):
 
     
 #%%
-N=200
+N=500
 mediciones=np.zeros([3,N,2500])
 parametros=np.zeros([8,N])
 xze,xin,yze1,ymu1,yoff1,yze2,ymu2,yoff2=setup()
@@ -61,7 +61,7 @@ for i in range(N):
     mediciones[1,i,:]=data1
     mediciones[2,i,:]=data2
     if i%30==0 and i!=0:
-        print('Se hicieron',i,'mediciones')
+        print('Se realizaron',i,'mediciones')
 for i in range(N):
     data1=mediciones[1,i,:]
     data2=mediciones[2,i,:]
