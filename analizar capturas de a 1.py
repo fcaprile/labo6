@@ -23,7 +23,7 @@ from scipy.signal import filtfilt as filtro
 plt.clf()
 plt.close()
 
-carpeta='C:/Users/Admin/Desktop/L6 Caprile Rosenberg/python/mediciones/4-3/'
+carpeta='C:/Users/Admin/Desktop/labo6_Rosenberg_Caprile/mediciones/4-3/'
 #carpeta='C:/Users/ferchi/Desktop/github labo 6/labo6/mediciones/27-03/'
 indice=[]
 for archivo in os.listdir(carpeta):
