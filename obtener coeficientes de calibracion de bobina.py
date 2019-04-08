@@ -93,6 +93,7 @@ n=50
 A=np.zeros(len(medicionesR[:,0]))#coeficiente de amplitudes
 #A=np.zeros(len(kes))#coeficiente de amplitudes
 B=np.zeros(len(medicionesR[:,0]))#coeficientes de "ensanchado"
+C=np.zeros(len(medicionesR[:,0]))#diferencia de tiempo
 nk=0
 for k in range(len(medicionesR[:,0])-1):
     #resistencia
@@ -115,7 +116,7 @@ for k in range(len(medicionesR[:,0])-1):
         dt=t[1]-t[0]
         peaksR, _ = find_peaks(-yR,200,distance=100)
         A[nk] = np.divide(yR[iR[0]], yint[iB[0]])
-#        tB=t-t[i2[0]]+t[i1[0]]
+        C[nk]=t[iR[0]]-t[iB[0]]
         anchoR_pos =ancho(-yR,iR,rel_height=1/np.sqrt(2))
         anchoR=t[int(anchoR_pos[3])]-t[int(anchoR_pos[2])]
         anchoB_pos =ancho(-yint,iB,rel_height=1/np.sqrt(2))
@@ -130,12 +131,17 @@ for k in range(len(medicionesR[:,0])-1):
     if k%50==0 and k!=0:
         print('Ya se analizaron',k,'mediciones!')
 
-#coeficiente ancho
 if A[-1]==0:
     A=np.delete(A,-1)
 
 if B[-1]==0:
     B=np.delete(B,-1)
+
+if C[-1]==0:
+    C=np.delete(C,-1)
+
+
+#coeficiente ancho
 
 coeficientes_ancho=[]
 for i in range(len(B)):
@@ -147,6 +153,24 @@ n,bins,patches=plt.hist(coeficientes_ancho,20,edgecolor='blue')
 plt.title('Histograma de valores de la constante de ancho')
 plt.xlabel('Valor de "B"')
 plt.ylabel('Cantidad')
+
+#coeficiente tiempo
+
+
+coeficientes_tiempo=[]
+for i in range(len(C)):
+    if C[i]!=C[i-1]:
+        coeficientes_tiempo.append(B[i])
+coeficientes_tiempo=np.array(coeficientes_tiempo)
+plt.figure(num=3, figsize=(14, 10), dpi=80, facecolor='w', edgecolor='k')
+n,bins,patches=plt.hist(coeficientes_tiempo,20,edgecolor='blue')
+plt.title('Histograma de valores de la diferencia temporal')
+plt.xlabel('Valor de "dt"')
+plt.ylabel('Cantidad')
+
+
+
+
 
 #media=np.mean(coeficientes_ancho)
 #N=len(coeficientes_ancho)
