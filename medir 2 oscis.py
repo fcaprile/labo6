@@ -46,7 +46,7 @@ class Osciloscopio:
 
     def medir_ambos_ch():
         self.osci.write('ACQuire:STATE RUN')
-        self.osci.write('ACQuire:STOPAfter SEQuence')#mejorar para que solo corra y pare
+        self.osci.write('ACQuire:STATE STOP')#mejorar para que solo corra y pare
         self.osci.write('DAT:SOU CH1' )
         data1=self.osci.query_binary_values('CURV?', datatype='B',container=np.array)
         self.osci.write('DAT:SOU CH2')    
