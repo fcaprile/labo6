@@ -21,16 +21,16 @@ class Osciloscopio:
         yze2,ymu2,yoff2=self.osci.query_ascii_values('WFMPRE:CH2:YZE?;YMU?;YOFF?',separator=';')         
         self.escala=xze,xin,yze1,ymu1,yoff1,yze2,ymu2,yoff2
         
-    def identificacion(self):
+    def idn(self):
         return self.osci.query('*IDN?')
     
-    def preguntar_escala(self):
+    def obtener_escalas(self):
         xze,xin,yze1,ymu1,yoff1=self.osci.query_ascii_values('WFMPRE:XZE?;XIN?;CH1:YZE?;YMU?;YOFF?',separator=';')
         yze2,ymu2,yoff2=self.osci.query_ascii_values('WFMPRE:CH2:YZE?;YMU?;YOFF?',separator=';')
         
         return xze,xin,yze1,ymu1,yoff1,yze2,ymu2,yoff2
 
-    def medir_trigger_ambos_ch():
+    def medir_trigger_ambos_ch(self):
         self.osci.write('ACQuire:STATE RUN')
         self.osci.write('ACQuire:STOPAfter SEQuence')
         r=self.osci.query('ACQuire:STATE?')
@@ -43,8 +43,19 @@ class Osciloscopio:
         data2=self.osci.query_binary_values('CURV?', datatype='B',container=np.array)
 
         return data1,data2
-
-    def medir_ambos_ch():
+    def medir(ch):
+        xze,xin,yze1,ymu1,yoff1=osci.query_ascii_values('WFMPRE:XZE?;XIN?;CH1:YZE?;YMU?;YOFF?',separator=';')
+        yze2,ymu2,yoff2=osci.query_ascii_values('WFMPRE:CH2:YZE?;YMU?;YOFF?',separator=';')
+        self.osci.write('DAT:ENC RPB')
+        self.osci.write('DAT:WID 1')
+        self.osci.write('ACQuire:STATE RUN')
+        self.osci.write('ACQuire:STATE STOP')#mejorar para que solo corra y pare
+        self.osci.write('DAT:SOU CH{}'.format(ch) )
+        data=osci.query_binary_values('CURV?', datatype='B',container=np.array)
+    
+        return data
+    
+    def medir_ambos_ch(self):
         self.osci.write('ACQuire:STATE RUN')
         self.osci.write('ACQuire:STATE STOP')#mejorar para que solo corra y pare
         self.osci.write('DAT:SOU CH1' )
@@ -54,14 +65,24 @@ class Osciloscopio:
 
         return data1,data2
 
-    def escalar_ambos_ch(data1,data2):
+    def escalar_ch(self,data,ch):
+        xze,xin,yze1,ymu1,yoff1,yze2,ymu2,yoff2=self.escala
+        if ch==1:
+            data=(data-yoff1)*ymu1+yze1
+        if ch==2:
+            data=(data-yoff2)*ymu2+yze2
+            
+        tiempo = xze + np.arange(len(data)) * xin
+    
+        return tiempo,data
+
+    def escalar_ambos_ch(self,data1,data2):
         xze,xin,yze1,ymu1,yoff1,yze2,ymu2,yoff2=self.escala
         data2=(data2-yoff2)*ymu2+yze2    
         tiempo = xze + np.arange(len(data1)) * xin
         data1=(data1-yoff1)*ymu1+yze1    
         
         return tiempo, data1, data2
-
 
         
     
@@ -85,16 +106,15 @@ for i in range(N):
     mediciones_osc1[1,i,:]=data1
     mediciones_osc1[2,i,:]=data2
     dts[i]=time.time()-tiempo_inicio
-    data1,data2=o2.medir_ambos_ch()
+    data1=o2.medir__ch(1)
     mediciones_osc2[1,i,:]=data1
-    mediciones_osc2[2,i,:]=data2
     if i%30==0 and i!=0:
         print('Se realizaron',i,'mediciones')
 
 #ajusto con la escala
 for i in range(N):
     tiempo_osc1,data1_osc1,data2_osc1=o1.escalar_ambos_ch(mediciones_osc1[1,i,:],mediciones_osc1[2,i,:])
-    tiempo_osc2,data1_osc2,data2_osc2=o2.escalar_ambos_ch(mediciones_osc2[1,i,:],mediciones_osc2[2,i,:])
+    tiempo_osc2,data1_osc2=o2.escalar_ch(mediciones_osc2[1,i,:],1)
     tiempo_osc2-=dts[i]
 
     
@@ -122,6 +142,31 @@ carpeta='C:/Users/Admin/Desktop/L6 Caprile Rosenberg/python/mediciones/4-3/'
 
 np.savetxt(carpeta+'datoscanal1_punta100-'+str(time.localtime()[0])+'-'+str(time.localtime()[1])+'-'+str(time.localtime()[2])+'-'+str(time.localtime()[3])+'-'+str(time.localtime()[4])+'.txt',Data1, fmt='%.18g', delimiter='\t', newline=os.linesep)
 np.savetxt(carpeta+'datoscanal2_punta100-'+str(time.localtime()[0])+'-'+str(time.localtime()[1])+'-'+str(time.localtime()[2])+'-'+str(time.localtime()[3])+'-'+str(time.localtime()[4])+'.txt',Data2, fmt='%.18g', delimiter='\t', newline=os.linesep)
+
+
+
+#%%
+#si se usan 2 canal para el osciloscopio 2:
+for i in range(N):
+    tiempo_inicio=time.time()
+    data1,data2=o1.medir_ambos_ch()
+    mediciones_osc1[1,i,:]=data1
+    mediciones_osc1[2,i,:]=data2
+    dts[i]=time.time()-tiempo_inicio
+    data1,data2=o2.medir_ambos_ch()
+    mediciones_osc2[1,i,:]=data1
+    mediciones_osc2[2,i,:]=data2
+    if i%30==0 and i!=0:
+        print('Se realizaron',i,'mediciones')
+
+
+
+
+
+
+
+
+
 
 
 #usar para medir ambos canales 1 sola vez:
