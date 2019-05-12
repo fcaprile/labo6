@@ -1,0 +1,1 @@
+Se eligio -0.7us dado que el 68% esta entre -0.8 y -0.6
