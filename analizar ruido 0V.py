@@ -1,5 +1,12 @@
 # -*- coding: utf-8 -*-
 """
+Created on Mon May 13 00:05:48 2019
+
+@author: ferchi
+"""
+
+# -*- coding: utf-8 -*-
+"""
 Created on Mon Apr  8 15:35:12 2019
 
 @author: Admin
@@ -107,49 +114,68 @@ for archivo in os.listdir(carpeta):
 
 
 exitos=np.array([2,7,9])       
-#for j in range(int(len(indice)/2)):
-#for j in exitos:
-j=2
+for j in range(int(len(indice)/2)):
+    bobina=Csv(carpeta,2*j,es_bobina=True)
+    resistencia=Csv(carpeta,2*j+1)
+#    resistencia.filtrar_por_vecinos(100)
+    bobina.sacar_lineal()
+    pico_bobina=bobina.encontrar_picos(0.8,distancia_entre_picos=100,valle=True)
+    pico_resistencia=resistencia.encontrar_picos(0.8,distancia_entre_picos=100)
+#    plot(bobina.x[pico_bobina],bobina.y[pico_bobina],fig_num=1,color='g*')
+#    plot(resistencia.x[pico_resistencia],resistencia.y[pico_resistencia]*200,fig_num=1,color='g*')
+    altura_pico_bobina=bobina.y[pico_bobina]
+    tiempo0=bobina.x[pico_bobina]
+    bobina.x-=tiempo0
+    resistencia.x-=tiempo0
+#    bobina.plot(fig_num=1,tamañox=14,tamañoy=10,color='b-')
+    resistencia.plot(fig_num=1,escala=200/altura_pico_bobina,tamañox=14,tamañoy=10,color='r-')
 
-bobina=Csv(carpeta,2*j,es_bobina=True)
-resistencia=Csv(carpeta,2*j+1)
-resistencia.filtrar_por_vecinos(10)
-bobina.sacar_lineal()
-bobina.plot(fig_num=j,tamañox=14,tamañoy=10,color='r-')
-resistencia.plot(fig_num=j,escala=200,tamañox=14,tamañoy=10,color='b-')
-pico_bobina=bobina.encontrar_picos(0.8,distancia_entre_picos=100,valle=True)
-pico_resistencia=resistencia.encontrar_picos(0.8,distancia_entre_picos=100)
-plt.plot(bobina.x[pico_bobina],bobina.y[pico_bobina],'g*')
-plt.plot(resistencia.x[pico_resistencia],resistencia.y[pico_resistencia]*200,'g*')
-
-print(resistencia.y[pico_resistencia])
-
-
-
-
-
-
-
+carpeta='C:/Users/ferchi/Desktop/github labo 6/labo6/mediciones/5-8/20/'
+indice=[]
+for archivo in os.listdir(carpeta):
+    if archivo.endswith(".csv"):
+        indice.append(archivo)
 
 
+exitos=np.array([2,7,9])       
+for j in range(int(len(indice)/2)):
+    bobina=Csv(carpeta,2*j,es_bobina=True)
+    resistencia=Csv(carpeta,2*j+1)
+#    resistencia.filtrar_por_vecinos(100)
+    bobina.sacar_lineal()
+    pico_bobina=bobina.encontrar_picos(0.8,distancia_entre_picos=100,valle=True)
+    pico_resistencia=resistencia.encontrar_picos(0.8,distancia_entre_picos=100)
+#    plot(bobina.x[pico_bobina],bobina.y[pico_bobina],fig_num=1,color='g*')
+#    plot(resistencia.x[pico_resistencia],resistencia.y[pico_resistencia]*200,fig_num=1,color='g*')
+    altura_pico_bobina=bobina.y[pico_bobina]
+    tiempo0=bobina.x[pico_bobina]
+    bobina.x-=tiempo0
+    resistencia.x-=tiempo0
+#    bobina.plot(fig_num=1,tamañox=14,tamañoy=10,color='b-')
+    resistencia.plot(fig_num=1,escala=200/altura_pico_bobina,tamañox=14,tamañoy=10,color='g-')
 
-#%%
-#indice=[]
-#for archivo in os.listdir(carpeta):
-#    if archivo.endswith(".csv"):
-#        indice.append(archivo)
 
-#nombre=indice[j]
-#data = genfromtxt(carpeta+nombre, delimiter=',')
-#
-#data=data[1:,:]
-#plt.figure(num=j, figsize=(14, 10), dpi=80, facecolor='w', edgecolor='k')
-#
-#plt.plot(data[:,0],data[:,1])
-#
+carpeta='C:/Users/ferchi/Desktop/github labo 6/labo6/mediciones/5-8/40/'
+indice=[]
+for archivo in os.listdir(carpeta):
+    if archivo.endswith(".csv"):
+        indice.append(archivo)
 
 
+exitos=np.array([2,7,9])       
+for j in range(int(len(indice)/2)):
+    bobina=Csv(carpeta,2*j,es_bobina=True)
+    resistencia=Csv(carpeta,2*j+1)
+#    resistencia.filtrar_por_vecinos(100)
+    bobina.sacar_lineal()
+    pico_bobina=bobina.encontrar_picos(0.8,distancia_entre_picos=100,valle=True)
+    pico_resistencia=resistencia.encontrar_picos(0.8,distancia_entre_picos=100)
+#    plot(bobina.x[pico_bobina],bobina.y[pico_bobina],fig_num=1,color='g*')
+#    plot(resistencia.x[pico_resistencia],resistencia.y[pico_resistencia]*200,fig_num=1,color='g*')
+    altura_pico_bobina=bobina.y[pico_bobina]
+    tiempo0=bobina.x[pico_bobina]
+    bobina.x-=tiempo0
+    resistencia.x-=tiempo0
+#    bobina.plot(fig_num=1,tamañox=14,tamañoy=10,color='b-')
+    resistencia.plot(fig_num=1,escala=200/altura_pico_bobina,tamañox=14,tamañoy=10,color='y-')
 
-
-#b=pd.read_csv(carpeta+nombre,header=None)
-#a=np.loadtxt(carpeta+nombre,delimiter=',')
