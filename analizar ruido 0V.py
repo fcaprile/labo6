@@ -94,7 +94,6 @@ class Csv(Data):
         plt.grid(True) # Para que quede en hoja cuadriculada
         plt.xlabel('Tiempo (s)')
         plt.ylabel('Tension (V)')
-        plt.legend(loc = 'best') 
 
 def plot(x,y,fig_num=0,escala=1,color='b-'):
     plt.figure(num= fig_num , figsize=(14, 10), dpi=80, facecolor='w', edgecolor='k')        
@@ -102,25 +101,29 @@ def plot(x,y,fig_num=0,escala=1,color='b-'):
     plt.grid(True) # Para que quede en hoja cuadriculada
     plt.xlabel('Tiempo (s)')
     plt.ylabel('Tension (V)')
-    plt.legend(loc = 'best') 
-    
+
+def promediar_columnas(data):
+    promedio=np.zeros(len(data[0,:]))
+    for i in range(len(data[0,:])):
+        promedio[i]=np.mean(data[:,i])
+    return promedio
     
 #%%
-carpeta='C:/Users/ferchi/Desktop/github labo 6/labo6/mediciones/5-8/0/'
+carpeta='C:/Users/DG/Desktop/Laboratorio 6 Caprile Rosenberg/labo6-master/mediciones/5-8/-0.0001/'
 indice=[]
 for archivo in os.listdir(carpeta):
     if archivo.endswith(".csv"):
         indice.append(archivo)
 
-
-exitos=np.array([2,7,9])       
+valor_ruido=[]
+ruidos=np.zeros([int(len(indice)/2),4000])
 for j in range(int(len(indice)/2)):
     bobina=Csv(carpeta,2*j,es_bobina=True)
     resistencia=Csv(carpeta,2*j+1)
-#    resistencia.filtrar_por_vecinos(100)
+    resistencia.filtrar_por_vecinos(100)
     bobina.sacar_lineal()
-    pico_bobina=bobina.encontrar_picos(0.8,distancia_entre_picos=100,valle=True)
-    pico_resistencia=resistencia.encontrar_picos(0.8,distancia_entre_picos=100)
+    pico_bobina=bobina.encontrar_picos(0.8,distancia_entre_picos=100,valle=True)[0]
+    pico_resistencia=resistencia.encontrar_picos(0.8,distancia_entre_picos=100)[0]
 #    plot(bobina.x[pico_bobina],bobina.y[pico_bobina],fig_num=1,color='g*')
 #    plot(resistencia.x[pico_resistencia],resistencia.y[pico_resistencia]*200,fig_num=1,color='g*')
     altura_pico_bobina=bobina.y[pico_bobina]
@@ -128,54 +131,10 @@ for j in range(int(len(indice)/2)):
     bobina.x-=tiempo0
     resistencia.x-=tiempo0
 #    bobina.plot(fig_num=1,tamañox=14,tamañoy=10,color='b-')
-    resistencia.plot(fig_num=1,escala=200/altura_pico_bobina,tamañox=14,tamañoy=10,color='r-')
-
-carpeta='C:/Users/ferchi/Desktop/github labo 6/labo6/mediciones/5-8/20/'
-indice=[]
-for archivo in os.listdir(carpeta):
-    if archivo.endswith(".csv"):
-        indice.append(archivo)
-
-
-exitos=np.array([2,7,9])       
-for j in range(int(len(indice)/2)):
-    bobina=Csv(carpeta,2*j,es_bobina=True)
-    resistencia=Csv(carpeta,2*j+1)
-#    resistencia.filtrar_por_vecinos(100)
-    bobina.sacar_lineal()
-    pico_bobina=bobina.encontrar_picos(0.8,distancia_entre_picos=100,valle=True)
-    pico_resistencia=resistencia.encontrar_picos(0.8,distancia_entre_picos=100)
-#    plot(bobina.x[pico_bobina],bobina.y[pico_bobina],fig_num=1,color='g*')
-#    plot(resistencia.x[pico_resistencia],resistencia.y[pico_resistencia]*200,fig_num=1,color='g*')
-    altura_pico_bobina=bobina.y[pico_bobina]
-    tiempo0=bobina.x[pico_bobina]
-    bobina.x-=tiempo0
-    resistencia.x-=tiempo0
-#    bobina.plot(fig_num=1,tamañox=14,tamañoy=10,color='b-')
-    resistencia.plot(fig_num=1,escala=200/altura_pico_bobina,tamañox=14,tamañoy=10,color='g-')
-
-
-carpeta='C:/Users/ferchi/Desktop/github labo 6/labo6/mediciones/5-8/40/'
-indice=[]
-for archivo in os.listdir(carpeta):
-    if archivo.endswith(".csv"):
-        indice.append(archivo)
-
-
-exitos=np.array([2,7,9])       
-for j in range(int(len(indice)/2)):
-    bobina=Csv(carpeta,2*j,es_bobina=True)
-    resistencia=Csv(carpeta,2*j+1)
-#    resistencia.filtrar_por_vecinos(100)
-    bobina.sacar_lineal()
-    pico_bobina=bobina.encontrar_picos(0.8,distancia_entre_picos=100,valle=True)
-    pico_resistencia=resistencia.encontrar_picos(0.8,distancia_entre_picos=100)
-#    plot(bobina.x[pico_bobina],bobina.y[pico_bobina],fig_num=1,color='g*')
-#    plot(resistencia.x[pico_resistencia],resistencia.y[pico_resistencia]*200,fig_num=1,color='g*')
-    altura_pico_bobina=bobina.y[pico_bobina]
-    tiempo0=bobina.x[pico_bobina]
-    bobina.x-=tiempo0
-    resistencia.x-=tiempo0
-#    bobina.plot(fig_num=1,tamañox=14,tamañoy=10,color='b-')
-    resistencia.plot(fig_num=1,escala=200/altura_pico_bobina,tamañox=14,tamañoy=10,color='y-')
-
+#    resistencia.plot(fig_num=1,escala=200/altura_pico_bobina,tamañox=14,tamañoy=10,color='r-')
+    ruidos[j,:]=resistencia.y
+    valor_ruido.append(resistencia.y[1917]/altura_pico_bobina)
+#ruido=promediar_columnas(ruidos)
+#plt.plot(bobina.x,ruido[:-1])
+print(np.mean(valor_ruido))
+ruido_pico=np.mean(valor_ruido)

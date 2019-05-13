@@ -20,16 +20,6 @@ from scipy.integrate import cumtrapz as integrar
 #plt.clf()
 #plt.close()
 
-#carpeta='C:/Users/Admin/Desktop/labo6_Rosenberg_Caprile/mediciones/4-10/'
-carpeta='C:/Users/ferchi/Desktop/github labo 6/labo6/mediciones/5-8/60/'
-indice=[]
-for archivo in os.listdir(carpeta):
-    if archivo.endswith(".csv"):
-        indice.append(archivo)
-
-
-
-
 class Data:        
     def sacar_offset(self,n):
         suma=0

@@ -87,7 +87,6 @@ class Csv(Data):
         plt.grid(True) # Para que quede en hoja cuadriculada
         plt.xlabel('Tiempo (s)')
         plt.ylabel('Tension (V)')
-        plt.legend(loc = 'best') 
 
 def plot(x,y,fig_num=0,escala=1,color='b-'):
     plt.figure(num= fig_num , figsize=(14, 10), dpi=80, facecolor='w', edgecolor='k')        
@@ -95,36 +94,43 @@ def plot(x,y,fig_num=0,escala=1,color='b-'):
     plt.grid(True) # Para que quede en hoja cuadriculada
     plt.xlabel('Tiempo (s)')
     plt.ylabel('Tension (V)')
-    plt.legend(loc = 'best') 
     
-    
+
+#def promedio_cercanos(data,posicion,numero_vecinos):
+
 #%%
-carpeta='C:/Users/ferchi/Desktop/github labo 6/labo6/mediciones/5-8/0/'
+carpeta='C:/Users/DG/Desktop/Laboratorio 6 Caprile Rosenberg/labo6-master/mediciones/5-8/-45/'
 indice=[]
 for archivo in os.listdir(carpeta):
     if archivo.endswith(".csv"):
         indice.append(archivo)
 
 
-exitos=np.array([2,7,9])       
+#exitos=np.array([2,7,9])       
 #for j in range(int(len(indice)/2)):
 #for j in exitos:
-j=2
+j=4
 
 bobina=Csv(carpeta,2*j,es_bobina=True)
 resistencia=Csv(carpeta,2*j+1)
 resistencia.filtrar_por_vecinos(10)
 bobina.sacar_lineal()
-bobina.plot(fig_num=j,tamañox=14,tamañoy=10,color='r-')
-resistencia.plot(fig_num=j,escala=200,tamañox=14,tamañoy=10,color='b-')
 pico_bobina=bobina.encontrar_picos(0.8,distancia_entre_picos=100,valle=True)
 pico_resistencia=resistencia.encontrar_picos(0.8,distancia_entre_picos=100)
-plt.plot(bobina.x[pico_bobina],bobina.y[pico_bobina],'g*')
-plt.plot(resistencia.x[pico_resistencia],resistencia.y[pico_resistencia]*200,'g*')
+tiempo0=bobina.x[pico_bobina]
+bobina.x-=tiempo0
+altura_pico_bobina=bobina.y[pico_bobina]
+resistencia.x-=tiempo0
+#bobina.plot(fig_num=j,tamañox=14,tamañoy=8,color='r-')
+resistencia.plot(fig_num=j,escala=-1/altura_pico_bobina,tamañox=14,tamañoy=6,color='b-')
+#plt.plot(bobina.x[pico_bobina],bobina.y[pico_bobina],'g*')
+#plt.plot(resistencia.x[pico_resistencia],resistencia.y[pico_resistencia],'g*')
 
-print(resistencia.y[pico_resistencia])
+posicion_x=np.where(abs(resistencia.x-3.2*10**-6)==min(abs(resistencia.x-3.2*10**-6)))
 
+print(resistencia.y[posicion_x])
 
+tensionesm45=np.array([-1.14,-0.93,-0.8,-0.94])
 
 
 
