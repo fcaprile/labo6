@@ -90,12 +90,12 @@ def plot(x,y,fig_num=0,escala=1,color='b-'):
 tensiones=[]
 corrientes_promedio=[]
 carpeta_base='C:/Users/DG/Desktop/Laboratorio 6 Caprile Rosenberg/labo6-master/mediciones/5-8/'
-#carpeta_base='C:/Users/ferchi/Desktop/github labo 6/labo6/mediciones/5-8/'
+carpeta_base='C:/Users/ferchi/Desktop/github labo 6/labo6/mediciones/5-15/'
 indice_carpetas=[]
 for nombre in os.listdir(carpeta_base):
     indice_carpetas.append(nombre)
  
-ruido_pico=-0.000126
+ruido_pico=0#-0.000126
 #for para carpetas:
 for i in indice_carpetas:
     carpeta=carpeta_base+i+'/'
@@ -108,14 +108,15 @@ for i in indice_carpetas:
     for j in range(int(len(indice)/2)):
         bobina=Csv(carpeta,2*j,es_bobina=True)
         resistencia=Csv(carpeta,2*j+1)
-#        resistencia.filtrar_por_vecinos(100)
+#        resistencia.filtrar_por_vecinos(50)
         bobina.sacar_lineal()
         pico_bobina=bobina.encontrar_picos(0.8,distancia_entre_picos=100,valle=True)[0]
         tiempo0=bobina.x[pico_bobina]
         altura_pico_bobina=bobina.y[pico_bobina]
         bobina.x-=tiempo0
         resistencia.x-=tiempo0
-        posicion_x=np.where(abs(resistencia.x-3.19*10**-6)==min(abs(resistencia.x-3.19*10**-6)))
+        tiempo_vuelo=3.19*10**-6
+        posicion_x=np.where(abs(resistencia.x-tiempo_vuelo)==min(abs(resistencia.x-tiempo_vuelo)))
         corrientes_maximas.append(-(resistencia.y[posicion_x]/altura_pico_bobina-ruido_pico)) #no divido por el valor de la R
     corrientes_maximas=np.array(corrientes_maximas)
     corrientes_promedio.append(np.mean(corrientes_maximas))
