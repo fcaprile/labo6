@@ -55,7 +55,7 @@ tiempo0=bobina.x[pico_bobina]
 altura_pico_bobina=bobina.y[pico_bobina]
 bobina.x-=tiempo0
 R.x-=tiempo0
-data=R.y/altura_pico_bobina
+data=-R.y/altura_pico_bobina
 tiempo=R.x
 y=filtrar(data)
 

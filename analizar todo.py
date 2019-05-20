@@ -50,7 +50,7 @@ def posicion_x(x,valorx):
     return posicion_x
     
 #%%
-carpeta_base='C:/Users/ferchi/Desktop/github labo 6/labo6/mediciones/5-15/'
+carpeta_base='C:/Users/ferchi/Desktop/github labo 6/labo6/mediciones/5-8/'
 indice_carpetas=[]
 for nombre in os.listdir(carpeta_base):
     indice_carpetas.append(nombre)
@@ -77,18 +77,19 @@ for i in indice_carpetas:
         tiempo=R.x
 #        y=filtrar(data)
         #promedio entre 3 y 5 us
-        t1=3.2*10**-6
-        t2=4.5*10**-6
+        t1=3.5*10**-6
+        t2=5*10**-6
         pos1=posicion_x(tiempo,t1)
         pos2=posicion_x(tiempo,t2)
         corrientes_matriz.append(np.mean(data[pos1:pos2]))
     corrientes.append(np.mean(corrientes_matriz))
-    error_corrientes.append(np.std(corrientes_matriz))
+    error_corrientes.append(np.std(corrientes_matriz)/np.sqrt(len(corrientes_matriz)))
     #    plt.figure(num= 0 , figsize=(14, 7), dpi=80, facecolor='w', edgecolor='k')
         #plt.plot(tiempo, data, 'b-', label='data')
     #    plt.plot(bobina.x,bobina.y/1200)
     print('Carpeta',i,'analizada!')
 
+error_corrientes=np.array(error_corrientes)
 corrientes=np.array(corrientes)
 tensiones=[]
 for i in indice_carpetas:
@@ -98,10 +99,23 @@ tensiones=np.array(tensiones)
 
 #plt.figure(num= 0 , figsize=(16, 11), dpi=80, facecolor='w', edgecolor='k')
 plt.plot(tensiones,corrientes,'b*')
+plt.errorbar(tensiones,corrientes,error_corrientes,linestyle = 'None')
 plt.ylabel('Corriente')
 plt.xlabel('Tensión (V)')
 plt.grid()
 
-#np.savetxt('curva carac entre 3,2 y 4,5.txt',[tensiones,corrientes], delimiter='\t')
+#np.savetxt('curva carac 8-5 entre 3,5 y 5 con error.txt',[tensiones,corrientes,error_corrientes], delimiter='\t')
 
+#%% Comparacion curvas
+
+tensiones8,corrientes8,error_corrientes8=np.loadtxt('curva carac 8-5 entre 3,5 y 5 con error.txt',delimiter='\t')
+tensiones15,corrientes15,error_corrientes15=np.loadtxt('curva carac entre 3,5 y 5 con error.txt',delimiter='\t')
+
+plt.plot(tensiones8,corrientes8,'b*',label='Mediciones del 8/5')
+plt.errorbar(tensiones8,corrientes8,error_corrientes8,linestyle = 'None')
+plt.plot(tensiones15,corrientes15/2,'g*',label='Mediciones del 15/5')
+plt.errorbar(tensiones15,corrientes15/2,error_corrientes15/2,linestyle = 'None')
+plt.ylabel('Corriente')
+plt.xlabel('Tensión (V)')
+plt.grid()
 
