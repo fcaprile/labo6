@@ -11,12 +11,6 @@ import os
 
 #ver por que hace falta dividir por 2...
 
-carpeta='C:/Users/DG/Desktop/Laboratorio 6 Caprile Rosenberg/labo6-master/mediciones/5-15/27.77/'
-carpeta='C:/Users/ferchi/Desktop/github labo 6/labo6/mediciones/5-15/64.4/'
-indice=[]
-for archivo in os.listdir(carpeta):
-    if archivo.endswith(".csv"):
-        indice.append(archivo)
         
 
 def filtrar(data):
@@ -113,60 +107,22 @@ def curva_por_carpeta(carpeta_base,plotear=False):
     return tensiones,corrientes,error_corrientes
     
 #%%
-carpeta_base='C:/Users/ferchi/Desktop/github labo 6/labo6/mediciones/5-8/'
-indice_carpetas=[]
-for nombre in os.listdir(carpeta_base):
-    indice_carpetas.append(nombre)
+carpeta_base1='C:/Users/ferchi/Desktop/github labo 6/labo6/mediciones/5-8/'
+carpeta_base1='C:/Users/DG/Documents/GitHub/labo6_2/mediciones/5-15/'
+carpeta_base2='C:/Users/DG/Documents/GitHub/labo6_2/mediciones/5-22/'
+carpeta_base3='C:/Users/DG/Documents/GitHub/labo6_2/mediciones/5-27/'
 
+tensiones=[]
 corrientes=[]
 error_corrientes=[]
-for i in indice_carpetas:
-    carpeta=carpeta_base+i+'/'
-    indice=[]
-    for archivo in os.listdir(carpeta):
-        if archivo.endswith(".csv"):
-            indice.append(archivo)
-    corrientes_matriz=[]
-    for j in range(int(len(indice)/2)):   
-        R=Csv(carpeta,2*j+1)
-        bobina=Csv(carpeta,2*j,es_bobina=True)
-        bobina.sacar_lineal()
-        pico_bobina=bobina.encontrar_picos(0.8,distancia_entre_picos=100,valle=True)[0]
-        tiempo0=bobina.x[pico_bobina]
-        altura_pico_bobina=bobina.y[pico_bobina]
-        bobina.x-=tiempo0
-        R.x-=tiempo0
-        data=-R.y/altura_pico_bobina
-        tiempo=R.x
-#        y=filtrar(data)
-        #promedio entre 3 y 5 us
-        t1=3.5*10**-6
-        t2=5*10**-6
-        pos1=posicion_x(tiempo,t1)
-        pos2=posicion_x(tiempo,t2)
-        corrientes_matriz.append(np.mean(data[pos1:pos2]))
-    corrientes.append(np.mean(corrientes_matriz))
-    error_corrientes.append(np.std(corrientes_matriz)/np.sqrt(len(corrientes_matriz)))
-    #    plt.figure(num= 0 , figsize=(14, 7), dpi=80, facecolor='w', edgecolor='k')
-        #plt.plot(tiempo, data, 'b-', label='data')
-    #    plt.plot(bobina.x,bobina.y/1200)
-    print('Carpeta',i,'analizada!')
 
-error_corrientes=np.array(error_corrientes)
-corrientes=np.array(corrientes)
-tensiones=[]
-for i in indice_carpetas:
-    tensiones.append(float(i))
-tensiones=np.array(tensiones)
+t1,c1,e1=curva_por_carpeta(carpeta_base1)
+t2,c2,e2=curva_por_carpeta(carpeta_base2)
+t3,c3,e3=curva_por_carpeta(carpeta_base3)
 
-
-#plt.figure(num= 0 , figsize=(16, 11), dpi=80, facecolor='w', edgecolor='k')
-plt.plot(tensiones,corrientes,'b*')
-plt.errorbar(tensiones,corrientes,error_corrientes,linestyle = 'None')
-plt.ylabel('Corriente')
-plt.xlabel('Tensión (V)')
-plt.grid()
-
+tensiones.append(t1)
+tensiones.append(t2)
+tensiones.append(t3)
 #np.savetxt('curva carac 8-5 entre 3,5 y 5 con error.txt',[tensiones,corrientes,error_corrientes], delimiter='\t')
 
 #%% Comparacion curvas
