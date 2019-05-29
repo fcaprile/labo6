@@ -72,6 +72,10 @@ class Data:
      
 class Csv(Data):
     def __init__ (self,carpeta,numero_de_archivo,es_bobina=False):
+        indice=[]
+        for archivo in os.listdir(carpeta):
+            if archivo.endswith(".csv"):
+                indice.append(archivo)
         nombre=indice[numero_de_archivo]        
         self.values=genfromtxt(carpeta+nombre, delimiter=',')
         self.values=self.values[1:,:]

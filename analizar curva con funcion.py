@@ -53,17 +53,19 @@ def posicion_x(x,valorx):
 
 def curva_por_carpeta(carpeta_base,plotear=False):
     indice_carpetas=[]
-    for nombre in os.listdir(carpeta_base):
-        indice_carpetas.append(nombre)
-    
+    for carpeta in os.listdir(carpeta_base):
+        indice_carpetas.append(carpeta)
+#    print(indice_carpetas)
     corrientes=[]
     error_corrientes=[]
     for i in indice_carpetas:
         carpeta=carpeta_base+i+'/'
+#        print(carpeta)
         indice=[]
         for archivo in os.listdir(carpeta):
             if archivo.endswith(".csv"):
                 indice.append(archivo)
+#        print(indice)
         corrientes_matriz=[]
         for j in range(int(len(indice)/2)):   
             R=Csv(carpeta,2*j+1)
@@ -107,10 +109,12 @@ def curva_por_carpeta(carpeta_base,plotear=False):
     return tensiones,corrientes,error_corrientes
     
 #%%
-carpeta_base1='C:/Users/ferchi/Desktop/github labo 6/labo6/mediciones/5-8/'
-carpeta_base1='C:/Users/DG/Documents/GitHub/labo6_2/mediciones/5-15/'
-carpeta_base2='C:/Users/DG/Documents/GitHub/labo6_2/mediciones/5-22/'
-carpeta_base3='C:/Users/DG/Documents/GitHub/labo6_2/mediciones/5-27/'
+carpeta_base1='C:/Users/ferchi/Desktop/github labo 6/labo6/mediciones/5-15/'
+carpeta_base2='C:/Users/ferchi/Desktop/github labo 6/labo6/mediciones/5-22/'
+carpeta_base3='C:/Users/ferchi/Desktop/github labo 6/labo6/mediciones/5-27/'
+#carpeta_base1='C:/Users/DG/Documents/GitHub/labo6_2/mediciones/5-15/'
+#carpeta_base2='C:/Users/DG/Documents/GitHub/labo6_2/mediciones/5-22/'
+#carpeta_base3='C:/Users/DG/Documents/GitHub/labo6_2/mediciones/5-27/'
 
 tensiones=[]
 corrientes=[]
@@ -120,9 +124,21 @@ t1,c1,e1=curva_por_carpeta(carpeta_base1)
 t2,c2,e2=curva_por_carpeta(carpeta_base2)
 t3,c3,e3=curva_por_carpeta(carpeta_base3)
 
-tensiones.append(t1)
-tensiones.append(t2)
-tensiones.append(t3)
+tensiones=np.concatenate([t1,t2,t3])
+
+corrientes=np.concatenate([c1,c2,c3])
+
+error_corrientes=np.concatenate([e1,e2,e3])
+
+tensiones8,corrientes8,error_corrientes8=np.loadtxt('curva carac 8-5 entre 3,5 y 5 con error.txt',delimiter='\t')
+plt.plot(tensiones8,corrientes8,'b*',label='Mediciones del 8/5')
+plt.errorbar(tensiones8,corrientes8,error_corrientes8,linestyle = 'None')
+plt.plot(tensiones,corrientes,'g*',label='Mediciones del 15/5')#para que de rasonable dividi por 2... no encuentro el motivo de que sea necesario
+plt.errorbar(tensiones,corrientes,error_corrientes,linestyle = 'None')
+plt.ylabel('Corriente')
+plt.xlabel('Tensión (V)')
+plt.grid()
+
 #np.savetxt('curva carac 8-5 entre 3,5 y 5 con error.txt',[tensiones,corrientes,error_corrientes], delimiter='\t')
 
 #%% Comparacion curvas
