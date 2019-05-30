@@ -1,16 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Sun May 12 23:05:33 2019
-
-@author: ferchi
-"""
-
-# -*- coding: utf-8 -*-
-"""
-Created on Mon Apr  8 15:35:12 2019
-
-@author: Admin
-"""
 import pandas as pd
 from matplotlib import pyplot as plt
 import numpy as np
@@ -19,6 +6,7 @@ from numpy import genfromtxt
 from scipy.integrate import cumtrapz as integrar
 #plt.clf()
 #plt.close()
+
 
 class Data:        
     def sacar_offset(self,n):
@@ -74,6 +62,10 @@ class Data:
      
 class Csv(Data):
     def __init__ (self,carpeta,numero_de_archivo,es_bobina=False):
+        indice=[]
+        for archivo in os.listdir(carpeta):
+            if archivo.endswith(".csv"):
+                indice.append(archivo)
         nombre=indice[numero_de_archivo]        
         self.values=genfromtxt(carpeta+nombre, delimiter=',')
         self.values=self.values[1:,:]
@@ -89,7 +81,6 @@ class Csv(Data):
         plt.grid(True) # Para que quede en hoja cuadriculada
         plt.xlabel('Tiempo (s)')
         plt.ylabel('Tension (V)')
-        plt.legend(loc = 'best') 
 
 def plot(x,y,fig_num=0,escala=1,color='b-'):
     plt.figure(num= fig_num , figsize=(14, 10), dpi=80, facecolor='w', edgecolor='k')        
@@ -97,19 +88,18 @@ def plot(x,y,fig_num=0,escala=1,color='b-'):
     plt.grid(True) # Para que quede en hoja cuadriculada
     plt.xlabel('Tension (V)')
     plt.ylabel('Corriente máxima (A)')
-    plt.legend(loc = 'best') 
     
     
 #%%
 tensiones=[]
 corrientes_promedio=[]
-#carpeta='C:/Users/Admin/Desktop/labo6_Rosenberg_Caprile/mediciones/4-10/
-carpeta_base='C:/Users/ferchi/Desktop/github labo 6/labo6/mediciones/5-8/'
+carpeta_base='C:/Users/DG/Desktop/Laboratorio 6 Caprile Rosenberg/labo6-master/mediciones/5-8/'
+carpeta_base='C:/Users/ferchi/Desktop/github labo 6/labo6/mediciones/5-15/'
 indice_carpetas=[]
 for nombre in os.listdir(carpeta_base):
     indice_carpetas.append(nombre)
  
-
+ruido_pico=0#-0.000126
 #for para carpetas:
 for i in indice_carpetas:
     carpeta=carpeta_base+i+'/'
@@ -122,20 +112,25 @@ for i in indice_carpetas:
     for j in range(int(len(indice)/2)):
         bobina=Csv(carpeta,2*j,es_bobina=True)
         resistencia=Csv(carpeta,2*j+1)
-        resistencia.filtrar_por_vecinos(100)
+#        resistencia.filtrar_por_vecinos(50)
         bobina.sacar_lineal()
         pico_bobina=bobina.encontrar_picos(0.8,distancia_entre_picos=100,valle=True)[0]
-        if float(i)>=0:
-            pico_resistencia=resistencia.encontrar_picos(0.8,distancia_entre_picos=100)[0]
-        else:
-            pico_resistencia=resistencia.encontrar_picos(0.8,distancia_entre_picos=100,valle=True)[0]
-        corrientes_maximas.append(float(resistencia.y[pico_resistencia]/1000/bobina.y[pico_bobina])) #divido por el valor de la R
+        tiempo0=bobina.x[pico_bobina]
+        altura_pico_bobina=bobina.y[pico_bobina]
+        bobina.x-=tiempo0
+        resistencia.x-=tiempo0
+        tiempo_vuelo=3.19*10**-6
+        posicion_x=np.where(abs(resistencia.x-tiempo_vuelo)==min(abs(resistencia.x-tiempo_vuelo)))
+        corrientes_maximas.append(-(resistencia.y[posicion_x]/altura_pico_bobina-ruido_pico)) #no divido por el valor de la R
     corrientes_maximas=np.array(corrientes_maximas)
     corrientes_promedio.append(np.mean(corrientes_maximas))
     print('Carpeta',i,'analizada!')
 
 corrientes_promedio=np.array(corrientes_promedio)
-
-plot(np.array(indice_carpetas),corrientes_promedio,color='b*')
+tensiones=[]
+for i in indice_carpetas:
+    tensiones.append(float(i))
+tensiones=np.array(tensiones)
+plot(tensiones,corrientes_promedio,color='b*')
 
 
