@@ -11,6 +11,9 @@ import os
 
 #ver por que hace falta dividir por 2...
 
+#falta ver de sacar mediciones muy diferentes
+
+
 carpeta='C:/Users/DG/Desktop/Laboratorio 6 Caprile Rosenberg/labo6-master/mediciones/5-15/27.77/'
 carpeta='C:/Users/ferchi/Desktop/github labo 6/labo6/mediciones/5-15/64.4/'
 indice=[]
@@ -56,6 +59,10 @@ def promediar_vectores(matriz): #formato: filas de vectores
 def posicion_x(x,valorx):
     posicion_x=np.where(abs(x-valorx)==min(abs(x-valorx)))[0][0]
     return posicion_x
+
+def y_dado_x(x,y,valorx):
+    pos=posicion_x(x,valorx)
+    return y[pos]
 
 def curva_por_carpeta(carpeta_base,plotear=False):
     indice_carpetas=[]
