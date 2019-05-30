@@ -83,8 +83,8 @@ def curva_por_carpeta(carpeta_base,plotear=False,sacar_outliers=False):
             tiempo=R.x
             #y=filtrar(data)
             #promedio entre 3 y 5 us
-            t1=3.5*10**-6
-            t2=5*10**-6
+            t1=4*10**-6
+            t2=4.7*10**-6
             pos1=posicion_x(tiempo,t1)
             pos2=posicion_x(tiempo,t2)
             corrientes_matriz.append(np.mean(data[pos1:pos2]))
@@ -133,7 +133,7 @@ t3,c3,e3=curva_por_carpeta(carpeta_base3,sacar_outliers=True)
 
 tensiones=np.concatenate([t1,t2,t3])
 
-corrientes=np.concatenate([np.array(c1),c2,c3])#ver de dividir por 2 a c1
+corrientes=np.concatenate([np.array(c1)/2,c2,c3])#ver de dividir por 2 a c1
 corrientes-=y_dado_x(tensiones,corrientes,0)
 error_corrientes=np.concatenate([e1,e2,e3])
 
@@ -142,11 +142,10 @@ corrientes8-=y_dado_x(tensiones8,corrientes8,0)
 plt.plot(tensiones8,corrientes8,'b*',label='Mediciones del 8/5')
 plt.errorbar(tensiones8,corrientes8,error_corrientes8,linestyle = 'None')
 plt.plot(tensiones,corrientes,'g*',label='Mediciones del 15/5')#para que de rasonable dividi por 2... no encuentro el motivo de que sea necesario
-plt.errorbar(tensiones,corrientes,error_corrientes/2,linestyle = 'None')
+plt.errorbar(tensiones,corrientes,error_corrientes,linestyle = 'None')
 plt.ylabel('Corriente')
 plt.xlabel('Tensión (V)')
 plt.grid()
-#-0.0015 en -15
 #np.savetxt('curva carac 800V con t entre 3,5 y 5 sin outliers.txt',[tensiones,corrientes,error_corrientes], delimiter='\t')
 
 #%% Comparacion curvas
