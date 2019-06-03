@@ -1,5 +1,4 @@
-import numpy as np
-from scipy.signal import butter, lfilter, freqz,filtfilt
+﻿import numpy as np
 from matplotlib import pyplot as plt
 import os
 
@@ -11,7 +10,6 @@ import os
 
 #ver por que hace falta dividir por 2...
 
-#falta multiplicar por el valor medio de coriente de bobina       
 
 def filtrar(data):
     def butter_lowpass(cutoff, fs, order=5):
@@ -119,26 +117,42 @@ def curva_por_carpeta(carpeta_base,plotear=False,sacar_outliers=False):
     return tensiones,corrientes,error_corrientes
     
 #%%
+#analizo
 carpeta_base1='C:/Users/ferchi/Desktop/github labo 6/labo6/mediciones/5-15/'
 carpeta_base2='C:/Users/ferchi/Desktop/github labo 6/labo6/mediciones/5-22/'
 carpeta_base3='C:/Users/ferchi/Desktop/github labo 6/labo6/mediciones/5-27/'
-#carpeta_base1='C:/Users/DG/Documents/GitHub/labo6_2/mediciones/5-15/'
-#carpeta_base2='C:/Users/DG/Documents/GitHub/labo6_2/mediciones/5-22/'
-#carpeta_base3='C:/Users/DG/Documents/GitHub/labo6_2/mediciones/5-27/'
+carpeta_base1='C:/Users/DG/Documents/GitHub/labo6_2/mediciones/Mediciones filtradas (saque las feas)/5-15/'
+carpeta_base2='C:/Users/DG/Documents/GitHub/labo6_2/mediciones/Mediciones filtradas (saque las feas)/5-22/'
+carpeta_base3='C:/Users/DG/Documents/GitHub/labo6_2/mediciones/Mediciones filtradas (saque las feas)/5-27/'
 
 
 t1,c1,e1=curva_por_carpeta(carpeta_base1,sacar_outliers=True)
 t2,c2,e2=curva_por_carpeta(carpeta_base2,sacar_outliers=True)
 t3,c3,e3=curva_por_carpeta(carpeta_base3,sacar_outliers=True)
+#%%
+#corrijo unidades y ploteo
 
 tensiones=np.concatenate([t1,t2,t3])
+corrientes=np.concatenate([np.array(c1),c2,c3])*568#ver de dividir por 2 a c1...
+error_corrientes=np.concatenate([e1,e2,e3])*568
 
-corrientes=np.concatenate([np.array(c1)/2,c2,c3])#ver de dividir por 2 a c1
+A2=np.array([tensiones,corrientes,error_corrientes])
+A2=np.transpose(A2)
+A2=A2[A2[:,0].argsort()]
+A2=np.transpose(A2)#dificil de creer pero funciona
+tensiones,corrientes,error_corrientes=A2
+
 corrientes-=y_dado_x(tensiones,corrientes,0)
-error_corrientes=np.concatenate([e1,e2,e3])
-
-tensiones8,corrientes8,error_corrientes8=np.loadtxt('C:/Users/ferchi/Desktop/github labo 6/labo6/resultados/curva característica sonda doble Langmuir/txt curvas carac/curva carac 8-5 entre 3,5 y 5 con error.txt',delimiter='\t')
+corrientes/=1000/10#lo convierto a corriente y ajusto el tema de la punta x10 (//10=*10)
+error_corrientes/=1000/10
+carpeta_900V='C:/Users/ferchi/Desktop/github labo 6/labo6/resultados/curva característica sonda doble Langmuir/txt curvas carac/'
+carpeta_900V='C:/Users/DG/Documents/GitHub/labo6_2/resultados/curva característica sonda doble Langmuir/txt curvas carac/'
+tensiones8,corrientes8,error_corrientes8=np.loadtxt(carpeta_900V+'curva carac 8-5 entre 3,5 y 5 con error.txt',delimiter='\t')
+corrientes8*=568
 corrientes8-=y_dado_x(tensiones8,corrientes8,0)
+corrientes8/=1000/10
+error_corrientes8/=1000/10
+
 plt.plot(tensiones8,corrientes8,'b*',label='Mediciones del 8/5')
 plt.errorbar(tensiones8,corrientes8,error_corrientes8,linestyle = 'None')
 plt.plot(tensiones,corrientes,'g*',label='Mediciones del 15/5')#para que de rasonable dividi por 2... no encuentro el motivo de que sea necesario
@@ -147,6 +161,64 @@ plt.ylabel('Corriente')
 plt.xlabel('Tensión (V)')
 plt.grid()
 #np.savetxt('curva carac 800V con t entre 3,5 y 5 sin outliers.txt',[tensiones,corrientes,error_corrientes], delimiter='\t')
+#%%
+#ajusto mediciones 800v
+
+auxc=[]
+auxt=[]
+auxe=[]
+for i in range(len(corrientes)):
+    if np.isnan(corrientes[i])==False:
+        auxc.append(corrientes[i])
+        auxt.append(tensiones[i])
+        auxe.append(error_corrientes[i])
+auxc=np.array(auxc)
+auxt=np.array(auxt)        
+auxe=np.array(auxe)        
+a=posicion_x(auxt,-6)
+b=posicion_x(auxt,8)
+y=auxc[a:b]
+x=auxt[a:b]
+ey=auxe[a:b]
+f=lambda x,A: A*x
+from scipy.optimize import curve_fit
+popt, pcov = curve_fit(f,x,y,sigma =ey)
+
+xx=np.linspace(min(x),max(x),1000)                    
+plt.plot(xx,f(xx, *popt), 'g-', label = 'Ajuste')#los popt son los valores de las variables fiteadas que usara la funcion f                      
+print('Te=',1/2/popt[0])
+
+#%%
+#ajusto mediciones 900v
+A2=np.array([tensiones8,corrientes8,error_corrientes8])
+A2=np.transpose(A2)
+A2=A2[A2[:,0].argsort()]
+A2=np.transpose(A2)#dificil de creer pero funciona
+tensiones8,corrientes8,error_corrientes8=A2
+
+auxc=[]
+auxt=[]
+auxe=[]
+for i in range(len(corrientes8)):
+    if np.isnan(corrientes8[i])==False:
+        auxc.append(corrientes8[i])
+        auxt.append(tensiones8[i])
+        auxe.append(error_corrientes8[i])
+auxc=np.array(auxc)
+auxt=np.array(auxt)        
+auxe=np.array(auxe)        
+a=posicion_x(auxt,-20)
+b=posicion_x(auxt,20)
+y=auxc[a:b]
+x=auxt[a:b]
+ey=auxe[a:b]
+f=lambda x,A: A*x
+from scipy.optimize import curve_fit
+popt, pcov = curve_fit(f,x,y,sigma =ey)
+
+xx=np.linspace(min(x),max(x),1000)                    
+plt.plot(xx,f(xx, *popt), 'y-', label = 'Ajuste')#los popt son los valores de las variables fiteadas que usara la funcion f                      
+print('Te=',1/2/popt[0])
 
 #%% Comparacion curvas
 
