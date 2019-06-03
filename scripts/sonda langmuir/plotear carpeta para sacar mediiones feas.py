@@ -105,11 +105,15 @@ def posicion_x(x,valorx):
     return posicion_x
 
 #%%
+plt.clf()
+plt.close()
 carpeta_base1='C:/Users/ferchi/Desktop/github labo 6/labo6/mediciones/5-15/'
 carpeta_base2='C:/Users/ferchi/Desktop/github labo 6/labo6/mediciones/5-22/'
 carpeta_base3='C:/Users/ferchi/Desktop/github labo 6/labo6/mediciones/5-27/'
-i=-30
-carpeta=carpeta_base3+str(i)+'/'
+carpeta_base2='C:/Users/DG/Documents/GitHub/labo6_2/mediciones/Mediciones filtradas (saque las feas)/5-22/'
+carpeta_base3='C:/Users/DG/Documents/GitHub/labo6_2/mediciones/Mediciones filtradas (saque las feas)/5-27/'
+i=-10
+carpeta=carpeta_base2+str(i)+'/'
 indice=[]
 for archivo in os.listdir(carpeta):
     if archivo.endswith(".csv"):
@@ -146,7 +150,8 @@ for j in range(len(indice)//2):
 #altura_media_pico_bobina=np.mean(np.array(alturas_picos))    
 altura_media_pico_bobina=-568
 for i in range(len(datas[:,0])):
-    plt.plot(tiempos[i,:],-datas[i,:]*altura_media_pico_bobina)
+    plt.plot(tiempos[i,:],-datas[i,:]*altura_media_pico_bobina,label=str(indice[2*i]))
+    plt.legend(loc = 'best') 
 media=np.mean(corrientes)*altura_media_pico_bobina
 print(media)
 corrientes=np.array(corrientes)
