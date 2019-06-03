@@ -113,8 +113,8 @@ carpeta_base3='C:/Users/ferchi/Desktop/github labo 6/labo6/mediciones/5-27/'
 carpeta_base1='C:/Users/DG/Documents/GitHub/labo6_2/mediciones/Mediciones filtradas (saque las feas)/5-15/'
 carpeta_base2='C:/Users/DG/Documents/GitHub/labo6_2/mediciones/Mediciones filtradas (saque las feas)/5-22/'
 carpeta_base3='C:/Users/DG/Documents/GitHub/labo6_2/mediciones/Mediciones filtradas (saque las feas)/5-27/'
-i=-10
-carpeta=carpeta_base2+str(i)+'/'
+i=1.2
+carpeta=carpeta_base1+str(i)+'/'
 indice=[]
 for archivo in os.listdir(carpeta):
     if archivo.endswith(".csv"):
@@ -157,6 +157,6 @@ media=np.mean(corrientes)*altura_media_pico_bobina
 print(media)
 corrientes=np.array(corrientes)
 for i in range(len(corrientes)):
-    if abs(corrientes[i]*altura_media_pico_bobina-media)>abs(media*0.6):
+    if abs(corrientes[i]*altura_media_pico_bobina-media)>abs(media*0.4):
         print('medicion',indice[2*i],'esta lejos')
 #plt.hist(corrientes)
