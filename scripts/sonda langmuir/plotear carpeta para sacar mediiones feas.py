@@ -110,11 +110,13 @@ plt.close()
 carpeta_base1='C:/Users/ferchi/Desktop/github labo 6/labo6/mediciones/5-15/'
 carpeta_base2='C:/Users/ferchi/Desktop/github labo 6/labo6/mediciones/5-22/'
 carpeta_base3='C:/Users/ferchi/Desktop/github labo 6/labo6/mediciones/5-27/'
+carpeta_base4='C:/Users/ferchi/Desktop/github labo 6/labo6/mediciones/6-3/'
 carpeta_base1='C:/Users/DG/Documents/GitHub/labo6_2/mediciones/Mediciones filtradas (saque las feas)/5-15/'
 carpeta_base2='C:/Users/DG/Documents/GitHub/labo6_2/mediciones/Mediciones filtradas (saque las feas)/5-22/'
 carpeta_base3='C:/Users/DG/Documents/GitHub/labo6_2/mediciones/Mediciones filtradas (saque las feas)/5-27/'
-i=1.2
-carpeta=carpeta_base1+str(i)+'/'
+carpeta_base4='C:/Users/DG/Documents/GitHub/labo6_2/mediciones/Mediciones filtradas (saque las feas)/6-3/'
+i=-12.5
+carpeta=carpeta_base4+str(i)+'/'
 indice=[]
 for archivo in os.listdir(carpeta):
     if archivo.endswith(".csv"):

@@ -159,12 +159,12 @@ popt, pcov = curve_fit(f,x,y,p0=iniciales,sigma = ey,absolute_sigma=True) #calcu
 #plotear el fiteo 
 xx=np.linspace(min(x),max(x),1000)                    
 plt.plot(xx,f(xx, popt[0], popt[1],popt[2],popt[3]), 'g-', label = 'Ajuste')#los popt son los valores de las variables fiteadas que usara la funcion f                      
-
+plt.plot(xx,f(xx, *popt), 'g-', label = 'Ajuste')#hace lo mismo mas compacto
 #plotear con valores iniciales:
-plt.plot(xx,f(xx, iniciales[0], iniciales[1],iniciales[2],iniciales[3]), 'g-', label = 'Ajuste')#los popt son los valores de las variables fiteadas que usara la funcion f                      
+plt.plot(xx,f(xx, *iniciales), 'g-', label = 'Ajuste')#los popt son los valores de las variables fiteadas que usara la funcion f                      
        
 #calcular R^2 y Chi cuadrado
-residuals = y- f(x, popt[0],popt[1])
+residuals = y- f(x, *popt)
 ss_res = np.sum(residuals**2)
 ss_tot = np.sum((y-np.mean(y))**2)
 r_squared = 1 - (ss_res / ss_tot)
