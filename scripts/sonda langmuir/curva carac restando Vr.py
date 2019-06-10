@@ -153,6 +153,8 @@ t1,c1,tm1,cm1,et1,ec1=curva_por_carpeta(carpeta_base1)#,sacar_outliers=True)
 t2,c2,tm2,cm2,et2,ec2=curva_por_carpeta(carpeta_base2)#,sacar_outliers=True)
 t3,c3,tm3,cm3,et3,ec3=curva_por_carpeta(carpeta_base3)#,sacar_outliers=True)
 t4,c4,tm4,cm4,et4,ec4=curva_por_carpeta(carpeta_base4)#,sacar_outliers=True)
+#%%
+tensiones,corrientes,error_tensiones,error_corrientes=np.loadtxt('curva carac 800V final.txt',delimiter='\t')
 
 
 #%%
@@ -201,14 +203,14 @@ corrientes/=1000#lo convierto a corriente y ajusto el tema de la punta x10 (//10
 error_corrientes/=1000
 carpeta_900V='C:/Users/ferchi/Desktop/github labo 6/labo6/resultados/curva característica sonda doble Langmuir/txt curvas carac/'
 carpeta_900V='C:/Users/DG/Documents/GitHub/labo6_2/resultados/curva característica sonda doble Langmuir/txt curvas carac/'
-tensiones8,corrientes8,error_corrientes8=np.loadtxt(carpeta_900V+'curva carac 8-5 entre 3,5 y 5 con error.txt',delimiter='\t')
+tensiones8,corrientes8,error_tensiones8,error_corrientes8=np.loadtxt('curva carac 900V con t entre 0.7 y 3 sin outliers.txt',delimiter='\t')
 corrientes8*=568
-corrientes8-=y_dado_x(tensiones8,corrientes8,0)
+#corrientes8-=y_dado_x(tensiones8,corrientes8,0)
 corrientes8/=1000
 error_corrientes8/=1000
 
 plt.plot(tensiones8,corrientes8*1000,'b*',label='Mediciones del 8/5')
-plt.errorbar(tensiones8,corrientes8*1000,error_corrientes8*1000,linestyle = 'None')
+plt.errorbar(tensiones8,corrientes8*1000,error_corrientes8*1000,error_tensiones8,linestyle = 'None')
 plt.plot(tensiones,corrientes*1000,'g*',label='Mediciones del 15/5')#para que de rasonable dividi por 2... no encuentro el motivo de que sea necesario
 plt.errorbar(tensiones,corrientes*1000,error_corrientes*1000,error_tensiones,linestyle = 'None')
 
@@ -216,6 +218,7 @@ plt.ylabel('Corriente (mA)')
 plt.xlabel('Tensión (V)')
 plt.grid()
 
+#np.savetxt('curva carac 800V final.txt',[tensiones,corrientes,error_tensiones,error_corrientes], delimiter='\t')
 
 #%%
 #ajusto mediciones 800v
@@ -354,11 +357,16 @@ print('Metodo Req con',vinfb,'y',vsupb, ', Te=',"%.2f" %Teb)
 
 #%%
 #ajusto mediciones 900v
-A2=np.array([tensiones8,corrientes8,error_corrientes8])
-A2=np.transpose(A2)
-A2=A2[A2[:,0].argsort()]
-A2=np.transpose(A2)#dificil de creer pero funciona
-tensiones8,corrientes8,error_corrientes8=A2
+#A2=np.array([tensiones8,corrientes8,error_corrientes8])
+#A2=np.transpose(A2)
+#A2=A2[A2[:,0].argsort()]
+#A2=np.transpose(A2)#dificil de creer pero funciona
+#tensiones8,corrientes8,error_corrientes8=A2
+tensiones8,corrientes8,error_tensiones8,error_corrientes8=np.loadtxt('curva carac 900V con t entre 0.7 y 3 sin outliers.txt',delimiter='\t')
+corrientes8*=568
+#corrientes8-=y_dado_x(tensiones8,corrientes8,0)
+corrientes8/=1000
+error_corrientes8/=1000
 
 auxc=[]
 auxt=[]
@@ -371,18 +379,59 @@ for i in range(len(corrientes8)):
 auxc=np.array(auxc)
 auxt=np.array(auxt)        
 auxe=np.array(auxe)        
-a=posicion_x(auxt,-20)
-b=posicion_x(auxt,20)
+a=posicion_x(auxt,-40)
+b=posicion_x(auxt,40)
 y=auxc[a:b]
 x=auxt[a:b]
 ey=auxe[a:b]
-f=lambda x,A: A*x
+f=lambda x,A,y0: A*x+y0
 from scipy.optimize import curve_fit
 popt, pcov = curve_fit(f,x,y,sigma =ey)
+plt.plot(tensiones8,corrientes8*1000,'b*',label='Mediciones del 8/5')
+tensiones,corrientes,error_tensiones,error_corrientes=np.loadtxt('curva carac 800V final.txt',delimiter='\t')
+plt.plot(tensiones,corrientes,'b*',label='Mediciones del 8/5')
 
 xx=np.linspace(min(x),max(x),1000)                    
-plt.plot(xx,f(xx, *popt), 'y-', label = 'Ajuste')#los popt son los valores de las variables fiteadas que usara la funcion f                      
-print('Te=',1/2/popt[0])
+plt.plot(xx,f(xx, *popt)*1000, 'y-', label = 'Ajuste')#los popt son los valores de las variables fiteadas que usara la funcion f                      
+print('A orden simetrico, Te=',1/2/popt[0]*0.00008)
+#%%
+#analisis 900V asimetrica
+#falto dividir por 1000 para que sea corriente pero como es una constante en comu al dividir ta too piola
+tensiones,corrientes,error_tensiones,error_corrientes=np.loadtxt('curva carac 900V con t entre 0.7 y 3 sin outliers.txt',delimiter='\t')
+
+vinfa=-45
+vinfb=-40
+vsupa=48
+vsupb=30
+f=lambda x,A,y0: A*x+y0
+from scipy.optimize import curve_fit
+
+popta1,pcova1=ajustar_entre(f,tensiones,corrientes,error_corrientes,-70,vinfa,escalay=1000,color='r',label='Ajuste con -17,16')
+popta2,pcova2=ajustar_entre(f,tensiones,corrientes,error_corrientes,vsupa,70,escalay=1000,color='r',label='Ajuste con -17,16')
+poptb1,pcovb1=ajustar_entre(f,tensiones,corrientes,error_corrientes,-70,vinfb,escalay=1000,color='r',label='Ajuste con -7,6')
+poptb2,pcovb2=ajustar_entre(f,tensiones,corrientes,error_corrientes,vsupb,70,escalay=1000,color='r',label='Ajuste con -7,6')
+#agregar error en tensiones al ajustar?
+
+Ie1a=abs(f(vector_entre(tensiones,vinfa,vsupa),*popta1)-corrientes[posicion_x(tensiones,vinfa):posicion_x(tensiones,vsupa)])
+Ie2a=abs(f(vector_entre(tensiones,vinfa,vsupa),*popta2)-corrientes[posicion_x(tensiones,vinfa):posicion_x(tensiones,vsupa)])
+plt.plot(vector_entre(tensiones,vinfa,vsupa),Ie1a,'b*',label='Ie1')
+plt.plot(vector_entre(tensiones,vinfa,vsupa),Ie2a,'b*',label='Ie2')
+plt.plot(vector_entre(tensiones,vinfa,vsupa),np.log(Ie1a/Ie2a),'b*',label='Ie1/Ie2')
+pa,ea=curve_fit(f,vector_entre(tensiones,vinfa,vsupa),np.log(Ie1a/Ie2a))
+plt.plot(vector_entre(tensiones,vinfa,vsupa),f(vector_entre(tensiones,vinfa,vsupa),*pa))
+Tea=1/pa[0]
+print('Contemplando la asimetria y con puntos de inflexion en',vinfa,'y',vsupa, ', Te=',"%.2f" %Tea)
+
+
+Ie1b=abs(f(vector_entre(tensiones,vinfb,vsupb),*poptb1)-corrientes[posicion_x(tensiones,vinfb):posicion_x(tensiones,vsupb)])
+Ie2b=abs(f(vector_entre(tensiones,vinfb,vsupb),*poptb2)-corrientes[posicion_x(tensiones,vinfb):posicion_x(tensiones,vsupb)])
+plt.plot(vector_entre(tensiones,vinfb,vsupb),Ie1b,'b*',label='Ie1')
+plt.plot(vector_entre(tensiones,vinfb,vsupb),Ie2b,'b*',label='Ie2')
+plt.plot(vector_entre(tensiones,vinfb,vsupb),np.log(Ie1b/Ie2b),'b*',label='Ie1/Ie2')
+pb,eb=curve_fit(f,vector_entre(tensiones,vinfb,vsupb),np.log(Ie1b/Ie2b))
+plt.plot(vector_entre(tensiones,vinfb,vsupb),f(vector_entre(tensiones,vinfb,vsupb),*pb))
+Teb=1/pb[0]
+print('Contemplando la asimetria y con puntos de inflexion en',vinfb,'y',vsupb, ', Te=',"%.2f" %Teb)
 
 
 #%% Comparacion sin analizar

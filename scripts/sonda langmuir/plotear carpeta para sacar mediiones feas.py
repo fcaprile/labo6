@@ -115,8 +115,11 @@ carpeta_base1='C:/Users/DG/Documents/GitHub/labo6_2/mediciones/Mediciones filtra
 carpeta_base2='C:/Users/DG/Documents/GitHub/labo6_2/mediciones/Mediciones filtradas (saque las feas)/5-22/'
 carpeta_base3='C:/Users/DG/Documents/GitHub/labo6_2/mediciones/Mediciones filtradas (saque las feas)/5-27/'
 carpeta_base4='C:/Users/DG/Documents/GitHub/labo6_2/mediciones/Mediciones filtradas (saque las feas)/6-3/'
-i=-12.5
-carpeta=carpeta_base4+str(i)+'/'
+
+carpeta_base900='C:/Users/DG/Documents/GitHub/labo6_2/mediciones/Mediciones filtradas (saque las feas)/5-8/'
+
+i=60
+carpeta=carpeta_base900+str(i)+'/'
 indice=[]
 for archivo in os.listdir(carpeta):
     if archivo.endswith(".csv"):

@@ -166,7 +166,7 @@ corrientes/=1000/10#lo convierto a corriente y ajusto el tema de la punta x10 (/
 error_corrientes/=1000/10
 carpeta_900V='C:/Users/ferchi/Desktop/github labo 6/labo6/resultados/curva característica sonda doble Langmuir/txt curvas carac/'
 carpeta_900V='C:/Users/DG/Documents/GitHub/labo6_2/resultados/curva característica sonda doble Langmuir/txt curvas carac/'
-tensiones8,corrientes8,error_corrientes8=np.loadtxt(carpeta_900V+'curva carac 8-5 entre 3,5 y 5 con error.txt',delimiter='\t')
+tensiones8,corrientes8,error_tensiones8,error_corrientes8=np.loadtxt(carpeta_900V+'curva carac 900V con t entre 0.7 y 3 sin outliers',delimiter='\t')
 corrientes8*=568
 corrientes8-=y_dado_x(tensiones8,corrientes8,0)
 corrientes8/=1000/10
