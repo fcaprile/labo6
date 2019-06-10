@@ -72,7 +72,41 @@ A2=np.transpose(A2)
 A2=A2[A2[:,0].argsort()]
 A2=np.transpose(A2)#dificil de creer pero funciona
 tensiones,corrientes,error_tensiones,error_corrientes=A2
+auxc=[]
+auxt=[]
+auxe=[]
+for i in range(len(corrientes)):
+    if np.isnan(corrientes[i])==False:
+        auxc.append(corrientes[i])
+        auxt.append(tensiones[i])
+        auxe.append(error_corrientes[i])
+auxc=np.array(auxc)
+auxt=np.array(auxt)        
+auxe=np.array(auxe)        
+a=posicion_x(auxt,0)
+b=posicion_x(auxt,43)
+y=auxc[a:b]
+x=auxt[a:b]
+ey=auxe[a:b]
+f=lambda x,A,y0: A*x+y0
+from scipy.optimize import curve_fit
+popt, pcov = curve_fit(f,x,y,sigma =ey)
+plt.plot(tensiones,corrientes*1000,'g*',label='Mediciones del 8/5')
+
+xx=np.linspace(min(x),max(x),1000)                    
+plt.plot(xx,f(xx, *popt)*1000, 'y-', label = 'Ajuste')#los popt son los valores de las variables fiteadas que usara la funcion f                      
+plt.errorbar(tensiones,corrientes*1000,error_corrientes*1000,error_tensiones,linestyle = 'None')
+plt.ylabel('Corriente (mA)')
+plt.xlabel('Tensión (V)')
+plt.grid()
+print('A orden simetrico, Te=',1/2/popt[0]*y[-1])
+plt.legend(loc = 'best') 
     
 #np.savetxt('curva carac 900V con t entre 0.7 y 3 sin outliers.txt',[tensiones,corrientes,error_tensiones,error_corrientes], delimiter='\t')
-
+#%%
+tensiones8,corrientes8,error_tensiones8,error_corrientes8=np.loadtxt('curva carac 900V con t entre 0.7 y 3 sin outliers.txt',delimiter='\t')
+corrientes8*=568
+#corrientes8-=y_dado_x(tensiones8,corrientes8,0)
+corrientes8/=1000
+error_corrientes8/=1000
 

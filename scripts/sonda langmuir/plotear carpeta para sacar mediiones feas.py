@@ -117,9 +117,10 @@ carpeta_base3='C:/Users/DG/Documents/GitHub/labo6_2/mediciones/Mediciones filtra
 carpeta_base4='C:/Users/DG/Documents/GitHub/labo6_2/mediciones/Mediciones filtradas (saque las feas)/6-3/'
 
 carpeta_base900='C:/Users/DG/Documents/GitHub/labo6_2/mediciones/Mediciones filtradas (saque las feas)/5-8/'
+carpeta_base1000='C:/Users/DG/Documents/GitHub/labo6_2/mediciones/Mediciones filtradas (saque las feas)/6-10/'
 
-i=60
-carpeta=carpeta_base900+str(i)+'/'
+i=48.7
+carpeta=carpeta_base1000+str(i)+'/'
 indice=[]
 for archivo in os.listdir(carpeta):
     if archivo.endswith(".csv"):
@@ -142,7 +143,7 @@ for j in range(len(indice)//2):
     tiempo=R.x
     #promedio entre 3 y 5 us
     t1=3.5*10**-6
-    t2=5*10**-6
+    t2=4.7*10**-6
     pos1=posicion_x(tiempo,t1)
     pos2=posicion_x(tiempo,t2)
     valor=np.mean(data[pos1:pos2])
