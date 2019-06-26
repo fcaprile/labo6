@@ -11,7 +11,7 @@ import time
 #path='C:/Users/Admin/Desktop/labo6_Rosenberg_Caprile/mediciones/'
 #day=str(time.localtime()[1])+'-'+str(time.localtime()[2])
 carpeta='C:/Users/DG/Documents/GitHub/labo6_2/mediciones/6-26/'
-voltajes=np.array([40,37.5,35,32.5,30,27.4,25,22.6,20,17.5,15,12.6,10,7.5,4.9])
+voltajes=np.array([42.5,45,47.4,50])
 for i in voltajes:
     os.mkdir(carpeta+str(i)+'/')
 
