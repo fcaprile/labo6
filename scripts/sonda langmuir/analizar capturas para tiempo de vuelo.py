@@ -112,6 +112,7 @@ def plot(x,y,fig_num=0,escala=1,color='b-'):
     
 #%%
 carpeta='C:/Users/DG/Desktop/Laboratorio 6 Caprile Rosenberg/labo6-master/mediciones/5-8/60/'
+carpeta='C:/Users/ferchi/Desktop/github labo 6/labo6/mediciones/5-15/'
 indice=[]
 for archivo in os.listdir(carpeta):
     if archivo.endswith(".csv"):
@@ -119,7 +120,7 @@ for archivo in os.listdir(carpeta):
 
 
 curvasresistencias=np.zeros([int(len(indice)/2)])
-j=14
+j=4
 bobina=Csv(carpeta,2*j,es_bobina=True)
 resistencia=Csv(carpeta,2*j+1)
 #resistencia.y-=ruido

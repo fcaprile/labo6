@@ -14,12 +14,7 @@ import os
 #va entre +-20+12? o entre +-15+12 us?
 #no hace falta multiplicar y va entre +-20+12
 
-
-#ver por que hace falta dividir por 2...
-
 #se asume que en todas las mediciones la sonda estaba correctamente medida en x10
-
-#restar valor caida sobre resistencia
 
 def filtrar(data):
     def butter_lowpass(cutoff, fs, order=5):
@@ -84,7 +79,8 @@ def curva_por_carpeta(carpeta_base):
             if archivo.endswith(".csv"):
                 indice.append(archivo)
 #        print(indice)
-        for j in range(int(len(indice)/2)):   
+        cant_mediciones_esta_carpeta=int(len(indice)/2)
+        for j in range(cant_mediciones_esta_carpeta):   
             R=Csv(carpeta,2*j+1)
             bobina=Csv(carpeta,2*j,es_bobina=True)
             bobina.sacar_lineal()
@@ -93,24 +89,25 @@ def curva_por_carpeta(carpeta_base):
             altura_pico_bobina=bobina.y[pico_bobina]
             bobina.x-=tiempo0
             R.x-=tiempo0
-            data=-R.y/altura_pico_bobina
-            tiempo=R.x
-            #y=filtrar(data)
-            #promedio entre 4 y 4.7 us
             t1=4*10**-6
             t2=4.7*10**-6
+            tiempo=R.x
             pos1=posicion_x(tiempo,t1)
             pos2=posicion_x(tiempo,t2)
-            corr=np.mean(data[pos1:pos2])
-            corrientes.append(corr)
-            corrientes_esta_carpeta.append(corr)
+            altura_valle=np.mean(R.y[pos1:pos2])
+            V=float(i)-altura_valle
+            altura_valle/=-altura_pico_bobina*568 #normalizo
+            
+            #y=filtrar(data)
+            #promedio entre 4 y 4.7 us
+            corrientes.append(altura_valle)
+            corrientes_esta_carpeta.append(altura_valle)
             #restar caida sobre resistencia
-            V=float(i)-np.mean(R.y[pos1:pos2])
             tensiones.append(V)
             tensiones_esta_carpeta.append(V)
         corriente_media.append(np.mean(corrientes_esta_carpeta))        
         tension_media.append(np.mean(tensiones_esta_carpeta))        
-        error_corriente_media.append(np.std(corrientes_esta_carpeta)/np.sqrt(len(corrientes_esta_carpeta)))
+        error_corriente_media.append(np.std(corrientes_esta_carpeta)/np.sqrt(len(corrientes_esta_carpeta)-1))
         error_tension_media.append(np.std(tensiones_esta_carpeta))#/np.sqrt(len(corrientes_esta_carpeta)))
         print('Carpeta',i,'analizada!')
     
@@ -139,29 +136,29 @@ def vector_entre(x,xinf,xsup):
 
 #%%
 #analizo
-carpeta_base1='C:/Users/ferchi/Desktop/github labo 6/labo6/mediciones/5-15/'
-carpeta_base2='C:/Users/ferchi/Desktop/github labo 6/labo6/mediciones/5-22/'
-carpeta_base3='C:/Users/ferchi/Desktop/github labo 6/labo6/mediciones/5-27/'
-carpeta_base4='C:/Users/ferchi/Desktop/github labo 6/labo6/mediciones/6-3/'
-carpeta_base1='C:/Users/DG/Documents/GitHub/labo6_2/mediciones/Mediciones filtradas (saque las feas)/5-15/'
-carpeta_base2='C:/Users/DG/Documents/GitHub/labo6_2/mediciones/Mediciones filtradas (saque las feas)/5-22/'
-carpeta_base3='C:/Users/DG/Documents/GitHub/labo6_2/mediciones/Mediciones filtradas (saque las feas)/5-27/'
-carpeta_base4='C:/Users/DG/Documents/GitHub/labo6_2/mediciones/Mediciones filtradas (saque las feas)/6-3/'
-#falta filtrar 6-3
+
+carpeta_base1='C:/Users/ferchi/Desktop/github labo 6/labo6/mediciones/Mediciones filtradas (saque las feas)/5-15/'
+carpeta_base2='C:/Users/ferchi/Desktop/github labo 6/labo6/mediciones/Mediciones filtradas (saque las feas)/5-22/'
+carpeta_base3='C:/Users/ferchi/Desktop/github labo 6/labo6/mediciones/Mediciones filtradas (saque las feas)/5-27/'
+carpeta_base4='C:/Users/ferchi/Desktop/github labo 6/labo6/mediciones/Mediciones filtradas (saque las feas)/6-3/'
+#carpeta_base1='C:/Users/DG/Documents/GitHub/labo6_2/mediciones/Mediciones filtradas (saque las feas)/5-15/'
+#carpeta_base2='C:/Users/DG/Documents/GitHub/labo6_2/mediciones/Mediciones filtradas (saque las feas)/5-22/'
+#carpeta_base3='C:/Users/DG/Documents/GitHub/labo6_2/mediciones/Mediciones filtradas (saque las feas)/5-27/'
+#carpeta_base4='C:/Users/DG/Documents/GitHub/labo6_2/mediciones/Mediciones filtradas (saque las feas)/6-3/'
 
 t1,c1,tm1,cm1,et1,ec1=curva_por_carpeta(carpeta_base1)#,sacar_outliers=True)
 t2,c2,tm2,cm2,et2,ec2=curva_por_carpeta(carpeta_base2)#,sacar_outliers=True)
 t3,c3,tm3,cm3,et3,ec3=curva_por_carpeta(carpeta_base3)#,sacar_outliers=True)
 t4,c4,tm4,cm4,et4,ec4=curva_por_carpeta(carpeta_base4)#,sacar_outliers=True)
 #%%
-tensiones,corrientes,error_tensiones,error_corrientes=np.loadtxt('curva carac 800V final.txt',delimiter='\t')
+tensiones,corrientes,error_tensiones,error_corrientes=np.loadtxt('C:/Users/ferchi/Desktop/github labo 6/labo6/resultados/curva característica sonda doble Langmuir/txt/curva carac 800V entre 4 y 4.7.txt',delimiter='\t')
 
 
 #%%
 #ploteo todas las mediciones
 
 tensiones=np.concatenate([t1,t2,t3,t4])
-corrientes=np.concatenate([np.array(c1),c2,c3,c4])*568
+corrientes=np.concatenate([np.array(c1),c2,c3,c4])
 
 A2=np.array([tensiones,corrientes])
 A2=np.transpose(A2)
@@ -170,12 +167,12 @@ A2=np.transpose(A2)#dificil de creer pero funciona
 tensiones,corrientes=A2
 
 corrientes-=y_dado_x(tensiones,corrientes,0)
-corrientes/=1000#lo convierto a corriente
+corrientes/=1000 #lo convierto a corriente
 carpeta_900V='C:/Users/ferchi/Desktop/github labo 6/labo6/resultados/curva característica sonda doble Langmuir/txt curvas carac/'
 carpeta_900V='C:/Users/DG/Documents/GitHub/labo6_2/resultados/curva característica sonda doble Langmuir/txt curvas carac/'
 tensiones8,corrientes8,error_corrientes8=np.loadtxt(carpeta_900V+'curva carac 8-5 entre 3,5 y 5 con error.txt',delimiter='\t')
-corrientes8*=568
-corrientes8-=y_dado_x(tensiones8,corrientes8,0)
+#corrientes8*=568 #multiuplico por el valor medio de corriente de bobina
+#corrientes8-=y_dado_x(tensiones8,corrientes8,0)
 corrientes8/=1000
 error_corrientes8/=1000
 
@@ -184,13 +181,17 @@ plt.plot(tensiones,corrientes*1000,'g*',label='Mediciones del 15/5')#para que de
 plt.ylabel('Corriente (mA)')
 plt.xlabel('Tensión (V)')
 plt.grid()
-#np.savetxt('curva carac 800V con t entre 3,5 y 5 sin outliers.txt',[tensiones,corrientes,error_corrientes], delimiter='\t')
+
+
+plt.plot()
+
+#np.savetxt('C:/Users/ferchi/Desktop/github labo 6/labo6/resultados/curva característica sonda doble Langmuir/txt/curva carac 800V entre 4 y 4.7.txt',[tensiones,corrientes,error_corrientes], delimiter='\t')
 #%%
 #ploteo mediciones promediadas
 tensiones=np.concatenate([tm1,tm2,tm3,tm4])
-corrientes=np.concatenate([np.array(cm1),cm2,cm3,cm4])*568#ver de dividir por 2 a c1...
+corrientes=np.concatenate([cm1,cm2,cm3,cm4])
 error_tensiones=np.concatenate([et1,et2,et3,et4])
-error_corrientes=np.concatenate([ec1,ec2,ec3,ec4])*568
+error_corrientes=np.concatenate([ec1,ec2,ec3,ec4])
 
 A2=np.array([tensiones,corrientes,error_corrientes,error_tensiones])
 A2=np.transpose(A2)
@@ -201,18 +202,18 @@ tensiones,corrientes,error_corrientes,error_tensiones=A2
 #corrientes-=y_dado_x(tensiones,corrientes,0)
 corrientes/=1000#lo convierto a corriente y ajusto el tema de la punta x10 (//10=*10)
 error_corrientes/=1000
-carpeta_900V='C:/Users/ferchi/Desktop/github labo 6/labo6/resultados/curva característica sonda doble Langmuir/txt curvas carac/'
-carpeta_900V='C:/Users/DG/Documents/GitHub/labo6_2/resultados/curva característica sonda doble Langmuir/txt curvas carac/'
-tensiones8,corrientes8,error_tensiones8,error_corrientes8=np.loadtxt('curva carac 900V con t entre 0.7 y 3 sin outliers.txt',delimiter='\t')
-corrientes8*=568
-#corrientes8-=y_dado_x(tensiones8,corrientes8,0)
-corrientes8/=1000
-error_corrientes8/=1000
-
-plt.plot(tensiones8,corrientes8*1000,'b*',label='Mediciones del 8/5')
-plt.errorbar(tensiones8,corrientes8*1000,error_corrientes8*1000,error_tensiones8,linestyle = 'None')
+#carpeta_900V='C:/Users/ferchi/Desktop/github labo 6/labo6/resultados/curva característica sonda doble Langmuir/txt curvas carac/'
+#carpeta_900V='C:/Users/DG/Documents/GitHub/labo6_2/resultados/curva característica sonda doble Langmuir/txt curvas carac/'
+#tensiones8,corrientes8,error_tensiones8,error_corrientes8=np.loadtxt('curva carac 900V con t entre 0.7 y 3 sin outliers.txt',delimiter='\t')
+##corrientes8*=568
+##corrientes8-=y_dado_x(tensiones8,corrientes8,0)
+#corrientes8/=1000
+#error_corrientes8/=1000
+#
+#plt.plot(tensiones8,corrientes8*1000,'b*',label='Mediciones del 8/5')
+#plt.errorbar(tensiones8,corrientes8*1000,error_corrientes8*1000,error_tensiones8,linestyle = 'None')
 plt.plot(tensiones,corrientes*1000,'g*',label='Mediciones del 15/5')#para que de rasonable dividi por 2... no encuentro el motivo de que sea necesario
-plt.errorbar(tensiones,corrientes*1000,error_corrientes*1000,error_tensiones,linestyle = 'None')
+plt.errorbar(tensiones,corrientes*1000,error_corrientes*1000,linestyle = 'None')
 
 plt.ylabel('Corriente (mA)')
 plt.xlabel('Tensión (V)')
