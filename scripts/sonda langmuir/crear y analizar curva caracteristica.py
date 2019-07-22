@@ -8,6 +8,7 @@ Created on Wed Jun  5 10:43:02 2019
 import numpy as np
 from matplotlib import pyplot as plt
 import os
+from numpy import genfromtxt
 
 
 #falta multiplicar por la escala temporal de 2*10**6*10**-12s=2*10**-6s?
