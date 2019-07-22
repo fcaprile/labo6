@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
 Created on Sat Jul 20 20:43:36 2019
 
@@ -41,57 +41,6 @@ def vector_entre(x,xinf,xsup):
     b=posicion_x(x,xsup)    
     return x[a:b]    
 #%%
-tensiones,corrientes,error_corrientes=np.loadtxt('C:/Users/ferchi/Desktop/github labo 6/labo6/resultados/curva característica sonda doble Langmuir/txt/curva carac 800V entre 4 y 4.7.txt',delimiter='\t')
-#corrientes/=1000
-#error_corrientes/=1000
-
-#sacar outliers
-tensiones=np.delete(tensiones,0)#si es .np
-corrientes=np.delete(corrientes,0)#si es .np
-error_corrientes=np.delete(error_corrientes,0)#si es .np
-tensiones=np.delete(tensiones,7)#si es .np
-corrientes=np.delete(corrientes,7)#si es .np
-error_corrientes=np.delete(error_corrientes,7)#si es .np
-
-
-plt.plot(tensiones,corrientes*1000,'b*',label='800 V')
-plt.errorbar(tensiones,corrientes*1000,error_corrientes*1000,linestyle = 'None')
-plt.ylabel('Corriente (mA)')
-plt.xlabel('Tensión (V)')
-plt.grid()
-
-#hago los ajustes
-
-f=lambda x,A,y0:A*x+y0
-
-sat_neg=-26
-sat_pos=35
-p_sat_neg,cov_sat_neg=ajustar_entre(f,tensiones,corrientes,error_corrientes,tensiones[0],sat_neg,escalay=1000,plot=False)
-p_sat_pos,cov_sat_pos=ajustar_entre(f,tensiones,corrientes,error_corrientes,sat_pos,tensiones[-1],escalay=1000,plot=False)
-
-lin_neg=-5
-lin_pos=6
-
-#si hago 2 ajustes:
-#p_lin_neg,cov_lin_neg=ajustar_entre(f,tensiones,corrientes,error_corrientes,lin_neg,0,escalay=1000,plot=False)
-#p_lin_pos,cov_lin_pos=ajustar_entre(f,tensiones,corrientes,error_corrientes,0,lin_pos,escalay=1000,plot=False)
-#x_plot=np.linspace(-20,0,100)
-#plt.plot(x_plot,f(x_plot,*p_lin_neg)*1000,'g',label='Lineal')
-#x_plot=np.linspace(0,15,100)
-#plt.plot(x_plot,f(x_plot,*p_lin_pos)*1000,'g')
-
-#si hago 1 solo ajuste
-p_lin,cov_lin=ajustar_entre(f,tensiones,corrientes,error_corrientes,lin_neg,lin_pos,escalay=1000,plot=False)
-
-x_plot=np.linspace(tensiones[0],-10,100)
-plt.plot(x_plot,f(x_plot,*p_sat_neg)*1000,'r',label='Saturación')
-x_plot=np.linspace(10,tensiones[-1],100)
-plt.plot(x_plot,f(x_plot,*p_sat_pos)*1000,'r')
-
-x_plot=np.linspace(-17,15,100)
-plt.plot(x_plot,f(x_plot,*p_lin)*1000,'g',label='Lineal')
-plt.legend(loc = 'best') 
-#%%
 #calculo temperatura electronica con funcion
 
 #V_min, V_max son los valores entre los cuales se hara el calculo log
@@ -123,10 +72,11 @@ def Temp_elec_asim(tensiones,corrientes,error_corrientes,lin_neg,lin_pos,sat_neg
         error = np.sqrt(cov[1,1]+xa**2*cov[0,0]+2*xa*cov[0,1])
         return(error)
     
-    Error_Ie1=error_lineal(t_lin,cov_sat_pos)+error_corrientes[a:b]
-    Error_Ie2=error_lineal(t_lin,cov_sat_neg)+error_corrientes[a:b]
+    Error_Ie1=np.sqrt(error_lineal(t_lin,cov_sat_pos)**2+error_corrientes[a:b]**2)
+    Error_Ie2=np.sqrt(error_lineal(t_lin,cov_sat_neg)**2+error_corrientes[a:b]**2)
+    cov_Ie1_Ie2=np.cov([Ie1,Ie2])
     
-    Error_log=np.sqrt((1/Ie1*Error_Ie1)**2+(1/Ie2*Error_Ie2)**2)
+    Error_log=np.sqrt((1/Ie1*Error_Ie1)**2+(1/Ie2*Error_Ie2)**2-1/Ie1/Ie2*cov_Ie1_Ie2[0,1])
 
     par_log,cov_log=curve_fit(f,t_lin,np.log(Ie1/Ie2),sigma=Error_log)
     Teb=1/par_log[0]
@@ -161,7 +111,6 @@ def Temp_elec_asim(tensiones,corrientes,error_corrientes,lin_neg,lin_pos,sat_neg
         plt.xlabel('Tensión (V)')
         plt.grid()
 
-#falta hacer propagacion de error... comming soon
 
 
 #%%  Corro la funcion para analizar
@@ -178,6 +127,6 @@ tensiones=np.delete(tensiones,7)#si es .np
 corrientes=np.delete(corrientes,7)#si es .np
 error_corrientes=np.delete(error_corrientes,7)#si es .np
        
-Temp_elec_asim(tensiones,corrientes,error_corrientes,-6,5,-26,35,-10,20)    
+Temp_elec_asim(tensiones,corrientes,error_corrientes,-6,5,-26,35,-15,20)    
   
 
