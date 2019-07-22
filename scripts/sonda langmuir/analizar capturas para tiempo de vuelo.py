@@ -112,7 +112,7 @@ def plot(x,y,fig_num=0,escala=1,color='b-'):
     
 #%%
 carpeta='C:/Users/DG/Desktop/Laboratorio 6 Caprile Rosenberg/labo6-master/mediciones/5-8/60/'
-carpeta='C:/Users/ferchi/Desktop/github labo 6/labo6/mediciones/5-15/'
+carpeta='C:/Users/ferchi/Desktop/github labo 6/labo6/mediciones/Mediciones filtradas (saque las feas)/5-15/19.97/'
 indice=[]
 for archivo in os.listdir(carpeta):
     if archivo.endswith(".csv"):

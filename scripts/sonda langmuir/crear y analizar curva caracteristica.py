@@ -96,8 +96,8 @@ def curva_por_carpeta(carpeta_base):
             pos2=posicion_x(tiempo,t2)
             altura_valle=np.mean(R.y[pos1:pos2])
             V=float(i)-altura_valle
-            altura_valle/=-altura_pico_bobina*568 #normalizo
-            
+            altura_valle/=-altura_pico_bobina #normalizo
+            altura_valle*=568
             #y=filtrar(data)
             #promedio entre 4 y 4.7 us
             corrientes.append(altura_valle)
@@ -107,7 +107,7 @@ def curva_por_carpeta(carpeta_base):
             tensiones_esta_carpeta.append(V)
         corriente_media.append(np.mean(corrientes_esta_carpeta))        
         tension_media.append(np.mean(tensiones_esta_carpeta))        
-        error_corriente_media.append(np.std(corrientes_esta_carpeta)/np.sqrt(len(corrientes_esta_carpeta)-1))
+        error_corriente_media.append(np.std(corrientes_esta_carpeta))
         error_tension_media.append(np.std(tensiones_esta_carpeta))#/np.sqrt(len(corrientes_esta_carpeta)))
         print('Carpeta',i,'analizada!')
     
@@ -200,7 +200,7 @@ A2=np.transpose(A2)#dificil de creer pero funciona
 tensiones,corrientes,error_corrientes,error_tensiones=A2
 
 #corrientes-=y_dado_x(tensiones,corrientes,0)
-corrientes/=1000#lo convierto a corriente y ajusto el tema de la punta x10 (//10=*10)
+corrientes/=1000#lo convierto a corriente 
 error_corrientes/=1000
 #carpeta_900V='C:/Users/ferchi/Desktop/github labo 6/labo6/resultados/curva característica sonda doble Langmuir/txt curvas carac/'
 #carpeta_900V='C:/Users/DG/Documents/GitHub/labo6_2/resultados/curva característica sonda doble Langmuir/txt curvas carac/'

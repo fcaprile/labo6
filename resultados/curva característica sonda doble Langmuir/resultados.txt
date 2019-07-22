@@ -1,0 +1,11 @@
+800V:
+Intervalo de tiempo del valle: 4 a 4.7 us
+
+
+
+900V:
+
+
+
+
+1000V:
