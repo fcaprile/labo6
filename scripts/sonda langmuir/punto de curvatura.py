@@ -74,9 +74,9 @@ def Temp_elec_asim(tensiones,corrientes,error_corrientes,lin_neg,lin_pos,sat_neg
     
     Error_Ie1=np.sqrt(error_lineal(t_lin,cov_sat_pos)**2+error_corrientes[a:b]**2)
     Error_Ie2=np.sqrt(error_lineal(t_lin,cov_sat_neg)**2+error_corrientes[a:b]**2)
-    cov_Ie1_Ie2=np.cov([Ie1,Ie2])
+#    cov_Ie1_Ie2=np.cov([Ie1,Ie2])
     
-    Error_log=np.sqrt((1/Ie1*Error_Ie1)**2+(1/Ie2*Error_Ie2)**2-1/Ie1/Ie2*cov_Ie1_Ie2[0,1])
+    Error_log=np.sqrt((Error_Ie1/Ie1)**2+(Error_Ie2/Ie2)**2-2/Ie1/Ie2*np.cov([Ie1,Ie2])[0,1])
 
     par_log,cov_log=curve_fit(f,t_lin,np.log(Ie1/Ie2),sigma=Error_log)
     Teb=1/par_log[0]
@@ -88,20 +88,20 @@ def Temp_elec_asim(tensiones,corrientes,error_corrientes,lin_neg,lin_pos,sat_neg
         plt.rcParams['font.size']=20#tamaño de fuente
         plt.figure(num=0, figsize=(9,6), dpi=80, facecolor='w', edgecolor='k')
         plt.subplots_adjust(left=0.14, bottom=0.13, right=0.98, top=0.98, wspace=None, hspace=None)
-        plt.plot(tensiones,corrientes*1000,'b*',label='800 V')
+        plt.plot(tensiones,corrientes*1000,'b*')
         plt.errorbar(tensiones,corrientes*1000,error_corrientes*1000,linestyle = 'None')
         plt.ylabel('Corriente (mA)')
         plt.xlabel('Tensión (V)')
         plt.grid()
 
         x_plot=np.linspace(tensiones[0],sat_neg*0.2,100)
-        plt.plot(x_plot,f(x_plot,*p_sat_neg)*1000,'r',label='Saturación')
+        plt.plot(x_plot,f(x_plot,*p_sat_neg)*1000,'r',label='Linea de saturación')
         x_plot=np.linspace(sat_pos*0.2,tensiones[-1],100)
         plt.plot(x_plot,f(x_plot,*p_sat_pos)*1000,'r')
         
         x_plot=np.linspace(lin_neg*1.8,lin_pos*1.8,100)
         plt.plot(x_plot,f(x_plot,*p_lin)*1000,'g',label='Lineal')
-        
+
         plt.figure(num=1, figsize=(9,6), dpi=80, facecolor='w', edgecolor='k')
         plt.subplots_adjust(left=0.14, bottom=0.13, right=0.98, top=0.98, wspace=None, hspace=None)
         plt.plot(t_lin,np.log(Ie1/Ie2),'b*',label='log(Ie1/Ie2)')
