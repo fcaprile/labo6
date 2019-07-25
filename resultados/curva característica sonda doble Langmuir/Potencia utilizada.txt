@@ -1,0 +1,1 @@
+No me acuerdo bien el valor de los capacitores... el informe do otro grupo dice 9.6uF, usamos 800V, 900V y 1000V asi que la potencia seria 1/2*C*V^2 = 3, 3.9 y 4.8 J
