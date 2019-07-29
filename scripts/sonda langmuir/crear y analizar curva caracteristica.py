@@ -17,6 +17,9 @@ from scipy.integrate import cumtrapz as integrar
 #no hace falta multiplicar y va entre +-20+12
 
 #se asume que en todas las mediciones la sonda estaba correctamente medida en x10
+
+#tiempo 800: 4 y 4,7us
+#tiempo 1000: 3 y 4 ponele
 class Data:        
     def sacar_offset(self,n):
         suma=0
@@ -165,8 +168,8 @@ def curva_por_carpeta(carpeta_base):
             altura_pico_bobina=bobina.y[pico_bobina]
             bobina.x-=tiempo0
             R.x-=tiempo0
-            t1=4*10**-6
-            t2=4.7*10**-6
+            t1=3*10**-6
+            t2=4*10**-6
             tiempo=R.x
             pos1=posicion_x(tiempo,t1)
             pos2=posicion_x(tiempo,t2)
@@ -229,6 +232,7 @@ t2,c2,tm2,cm2,et2,ec2=curva_por_carpeta(carpeta_base2)#,sacar_outliers=True)
 t3,c3,tm3,cm3,et3,ec3=curva_por_carpeta(carpeta_base3)#,sacar_outliers=True)
 t4,c4,tm4,cm4,et4,ec4=curva_por_carpeta(carpeta_base4)#,sacar_outliers=True)
 #%%
+#cargo txt
 tensiones,corrientes,error_tensiones,error_corrientes=np.loadtxt('C:/Users/ferchi/Desktop/github labo 6/labo6/resultados/curva característica sonda doble Langmuir/txt/curva carac 800V entre 4 y 4.7.txt',delimiter='\t')
 
 

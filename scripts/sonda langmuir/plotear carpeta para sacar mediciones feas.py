@@ -116,11 +116,13 @@ carpeta_base4='C:/Users/ferchi/Desktop/github labo 6/labo6/mediciones/Mediciones
 #carpeta_base3='C:/Users/DG/Documents/GitHub/labo6_2/mediciones/Mediciones filtradas (saque las feas)/5-27/'
 #carpeta_base4='C:/Users/DG/Documents/GitHub/labo6_2/mediciones/Mediciones filtradas (saque las feas)/6-3/'
 #
-#carpeta_base900='C:/Users/DG/Documents/GitHub/labo6_2/mediciones/Mediciones filtradas (saque las feas)/5-8/'
+carpeta_base900='C:/Users/DG/Documents/GitHub/labo6_2/mediciones/Mediciones filtradas (saque las feas)/5-8/'
 #carpeta_base1000='C:/Users/DG/Documents/GitHub/labo6_2/mediciones/Mediciones filtradas (saque las feas)/6-10/'
+carpeta_base900='C:/Users/ferchi/Desktop/github labo 6/labo6/mediciones/Mediciones filtradas (saque las feas)/5-8/'
+carpeta_base1000='C:/Users/ferchi/Desktop/github labo 6/labo6/mediciones/Mediciones filtradas (saque las feas)/6-10/'
 
-i=19.97
-carpeta=carpeta_base1+str(i)+'/'
+i=45
+carpeta=carpeta_base900+str(i)+'/'
 indice=[]
 for archivo in os.listdir(carpeta):
     if archivo.endswith(".csv"):
@@ -157,7 +159,7 @@ for j in range(len(indice)//2):
 #altura_media_pico_bobina=np.mean(np.array(alturas_picos))    
 altura_media_pico_bobina=-568
 for i in range(len(datas[:,0])):
-    plt.plot(tiempos[i,:],-datas[i,:]*altura_media_pico_bobina,label=str(indice[2*i]))
+    plt.plot(tiempos[i,:]*10**6,-datas[i,:]*altura_media_pico_bobina,label=str(indice[2*i]))
     plt.legend(loc = 'best') 
 media=np.mean(corrientes)*altura_media_pico_bobina
 print(media)

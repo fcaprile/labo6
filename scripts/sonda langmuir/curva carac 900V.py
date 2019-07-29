@@ -7,6 +7,7 @@ Created on Mon Jun 10 10:22:56 2019
 
 #los picos se ven entre 0.7 y 3 us. razon: desconocida... sera que la escala temporal es la mitad??
 
+#ahora mirando pondria entre 2 y 4
 def curva_por_carpeta(carpeta_base):
     indice_carpetas=[]
     for carpeta in os.listdir(carpeta_base):
@@ -41,8 +42,8 @@ def curva_por_carpeta(carpeta_base):
             tiempo=R.x
             #y=filtrar(data)
             #promedio entre 4 y 4.7 us
-            t1=0.7*10**-6
-            t2=3*10**-6
+            t1=2*10**-6
+            t2=4*10**-6
             pos1=posicion_x(tiempo,t1)
             pos2=posicion_x(tiempo,t2)
             corr=np.mean(data[pos1:pos2])
@@ -64,14 +65,19 @@ def curva_por_carpeta(carpeta_base):
     
     return tensiones,corrientes,tension_media,corriente_media,error_tension_media,error_corriente_media
 
+#☺falta multiplicar por el valor medio del pico
+
 #%%
 carpeta_base900='C:/Users/DG/Documents/GitHub/labo6_2/mediciones/Mediciones filtradas (saque las feas)/5-8/'
+carpeta_base900='C:/Users/ferchi/Desktop/github labo 6/labo6/mediciones/Mediciones filtradas (saque las feas)/5-8/'
 tensiones_todas,corrientes_todas,tensiones,corrientes,error_tensiones,error_corrientes=curva_por_carpeta(carpeta_base900)#,sacar_outliers=True)
 A2=np.array([tensiones,corrientes,error_tensiones,error_corrientes])
 A2=np.transpose(A2)
 A2=A2[A2[:,0].argsort()]
 A2=np.transpose(A2)#dificil de creer pero funciona
 tensiones,corrientes,error_tensiones,error_corrientes=A2
+corrientes/=1000
+error_corrientes/=1000
 auxc=[]
 auxt=[]
 auxe=[]
@@ -102,11 +108,75 @@ plt.grid()
 print('A orden simetrico, Te=',1/2/popt[0]*y[-1])
 plt.legend(loc = 'best') 
     
-#np.savetxt('curva carac 900V con t entre 0.7 y 3 sin outliers.txt',[tensiones,corrientes,error_tensiones,error_corrientes], delimiter='\t')
+#np.savetxt('curva carac 900V con t entre 2 y 4 final.txt',[tensiones,corrientes,error_corrientes], delimiter='\t')
 #%%
 tensiones8,corrientes8,error_tensiones8,error_corrientes8=np.loadtxt('curva carac 900V con t entre 0.7 y 3 sin outliers.txt',delimiter='\t')
 corrientes8*=568
 #corrientes8-=y_dado_x(tensiones8,corrientes8,0)
 corrientes8/=1000
 error_corrientes8/=1000
+
+#%%
+#analizo:
+
+def promediar_vectores(matriz): #formato: filas de vectores
+    columnas=len(matriz[0,:])
+    filas=len(matriz[:,0])
+    prom=np.zeros(columnas)
+    para_prom=np.zeros(filas,columnas)
+    for j in range(columnas):
+        prom[j]=np.mean(para_prom[:,j])
+
+def posicion_x(x,valorx):
+    posicion_x=np.where(abs(x-valorx)==min(abs(x-valorx)))[0][0]
+    return posicion_x
+
+def y_dado_x(x,y,valorx):
+    pos=posicion_x(x,valorx)
+    return y[pos]
+
+def ajustar_entre(f,x,y,ey,xinf,xsup,escalax=1,escalay=1,color='g',label='Ajuste',plot=True):
+    a=posicion_x(x,xinf)
+    b=posicion_x(x,xsup)    
+    y=y[a:b]
+    x=x[a:b]
+    ey=ey[a:b]
+    popt, pcov = curve_fit(f,x,y,sigma =ey)
+    if plot==True:
+        xx=np.linspace(min(x),max(x),1000)                    
+        plt.plot(xx*escalax,f(xx, *popt)*escalay, color=color, label = label)#los popt son los valores de las variables fiteadas que usara la funcion f                      
+    return popt,pcov
+
+def vector_entre(x,xinf,xsup):
+    a=posicion_x(x,xinf)
+    b=posicion_x(x,xsup)    
+    return x[a:b]    
+
+
+def analisis_simetrico_rama_pos(tensiones,corrientes,error_corrientes,lin_neg,lin_pos,sat,plot=True):
+    f=lambda x,A,y0:A*x+y0
+    par_lin,cov_lin=ajustar_entre(f,tensiones,corrientes,error_corrientes,lin_neg,lin_pos,plot=False)
+    par_sat,cov_sat=ajustar_entre(f,tensiones,corrientes,error_corrientes,sat,60,plot=False)
+    
+    Te=1/2/par_lin[0]*par_sat[1]
+    print('A orden simetrico, Te=',Te)
+    
+    if plot==True:
+        plt.rcParams['font.size']=20#tamaño de fuente
+        plt.figure(num=0, figsize=(9,6), dpi=80, facecolor='w', edgecolor='k')
+        plt.subplots_adjust(left=0.14, bottom=0.13, right=0.98, top=0.98, wspace=None, hspace=None)
+        plt.plot(tensiones,corrientes*1000,'b*')
+        plt.errorbar(tensiones,corrientes*1000,error_corrientes*1000,linestyle = 'None')
+        plt.ylabel('Corriente (mA)')
+        plt.xlabel('Tensión (V)')
+        plt.grid()
+
+        x_plot=np.linspace(0,tensiones[-1],100)
+        plt.plot(x_plot,f(x_plot,*par_sat)*1000,'r')
+        
+        x_plot=np.linspace(lin_neg,lin_pos,100)
+        plt.plot(x_plot,f(x_plot,*par_lin)*1000,'g')
+#%%
+analisis_simetrico_rama_pos(tensiones,corrientes,error_corrientes,-10,10,45)
+
 
